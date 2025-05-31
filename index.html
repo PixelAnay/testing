@@ -3,404 +3,517 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ephemeral Echoes</title>
+    <title>Digital Serenade: A Pixel Love Story</title>
     <style>
+        :root {
+            --scroll-progress: 0;
+            --scene1-progress: 0;
+            --scene2-progress: 0;
+            --scene3-progress: 0;
+            --scene4-progress: 0;
+            --scene5-progress: 0;
+
+            --boy-color-main: #3a7bd5;
+            --boy-color-accent: #00d2ff;
+            --girl-color-main: #f472b6;
+            --girl-color-accent: #fda4af;
+            --world-bg-start: #1a1a2e;
+            --world-bg-end: #16213e;
+            --interactive-glow: #e94560;
+        }
+
         *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
 
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden; /* No scrollbars for this one, full screen experience */
-            background-color: #030308; /* Very dark, almost black blue */
-            font-family: 'Times New Roman', Times, serif; /* Classic, elegant */
+        html {
+            scroll-behavior: auto; /* We need raw scroll for this */
         }
 
-        #mainCanvas {
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--world-bg-start), var(--world-bg-end));
+            color: #e0e0e0;
+            overflow-x: hidden;
+            min-height: 500vh; /* Make page very scrollable */
+            transition: background 1s ease;
+        }
+        
+        .parallax-bg {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -10;
+            overflow: hidden;
         }
 
-        .text-overlay {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 2;
-            text-align: center;
-            color: rgba(220, 220, 255, 0.8); /* Soft ethereal text color */
-            pointer-events: none; /* Allow canvas interaction */
-        }
-
-        .text-overlay p {
-            font-size: 1.8rem;
-            line-height: 1.6;
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
             opacity: 0;
-            transition: opacity 2.5s ease-in-out;
-            text-shadow: 0 0 10px rgba(180, 180, 255, 0.5), 0 0 20px rgba(150, 150, 220, 0.3);
-            margin-bottom: 15px;
+            animation: twinkle 5s infinite alternate;
         }
 
-        .text-overlay p.visible {
+        @keyframes twinkle {
+            0% { opacity: calc(0.2 + (var(--scroll-progress) * 0.6)); transform: scale(0.8); }
+            100% { opacity: calc(0.6 + (var(--scroll-progress) * 0.4)); transform: scale(1.2); }
+        }
+
+        .story-container {
+            width: 100%;
+            position: relative; /* Will pin elements to this */
+        }
+
+        .scene {
+            height: 100vh; /* Each "moment" is a full viewport scroll */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            opacity: calc(var(--scroll-progress) * 5); /* Fade in scenes */
+        }
+        
+        .scene-content {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; /* Clip elements moving outside */
+        }
+
+        .narrative-text {
+            position: absolute;
+            bottom: 10vh;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: clamp(1rem, 2.5vw, 1.5rem);
+            color: #f0f0f0;
+            text-align: center;
+            max-width: 80%;
+            padding: 10px 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            z-index: 100;
+        }
+
+        .scene.active .narrative-text {
             opacity: 1;
         }
 
-        .text-overlay p.small {
-            font-size: 1rem;
-            font-style: italic;
-            color: rgba(200, 200, 230, 0.6);
+        /* Characters - More stylized */
+        .character {
+            position: absolute;
+            width: 50px;
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s ease-out, opacity 0.5s ease-out;
+            z-index: 10;
         }
 
-        /* For subtle cues or instructions if needed later */
-        .instruction {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: rgba(200, 200, 255, 0.4);
-            font-size: 0.9rem;
-            z-index: 3;
-            opacity: 0;
-            animation: fadeInOutHint 10s ease-in-out 5s forwards;
-        }
-        
-        @keyframes fadeInOutHint {
-            0%, 100% { opacity: 0; }
-            10%, 40% { opacity: 1; }
-            50% { opacity: 0; } /* Keep it faded out after one cycle or make it loop */
-        }
-
-        /* Loading screen (optional but good for single file with lots of JS) */
-        #loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #030308;
-            z-index: 1000;
+        .head {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px; /* Pixelated feel */
+            margin-bottom: 4px;
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #aaa;
-            font-size: 1.5rem;
-            transition: opacity 1s ease-out;
         }
+        .body {
+            width: 30px;
+            height: 50px;
+            border-radius: 6px 6px 4px 4px;
+        }
+        .eye {
+            width: 6px;
+            height: 8px;
+            background-color: #fff;
+            border-radius: 2px;
+            position: absolute;
+            top: 12px;
+            animation: blink-subtle 4s infinite ease-in-out;
+        }
+        .eye.left { left: 8px; }
+        .eye.right { right: 8px; }
+        @keyframes blink-subtle {
+            0%, 95%, 100% { transform: scaleY(1); }
+            97.5% { transform: scaleY(0.1); }
+        }
+
+
+        #boy {
+            --char-x: calc(20vw - (var(--scene1-progress) * 15vw) + (var(--scene3-progress) * 10vw) - (var(--scene4-progress) * 0vw) + (var(--scene5-progress) * -5vw) );
+            --char-y: calc(50vh + (var(--scene1-progress) * 5vh) + (var(--scene3-progress) * -2vh) + (var(--scene5-progress) * 0vh) );
+            transform: translate(var(--char-x), var(--char-y)) scale(calc(1 + var(--scene1-progress)*0.1));
+        }
+        #boy .head { background-color: var(--boy-color-main); border: 2px solid color-mix(in srgb, var(--boy-color-main) 70%, black);}
+        #boy .body { background-color: var(--boy-color-accent); border: 2px solid color-mix(in srgb, var(--boy-color-accent) 70%, black);}
+
+        #girl {
+            --char-x: calc(80vw - (var(--scene1-progress) * 15vw) - (var(--scene3-progress) * 10vw) - (var(--scene4-progress) * 0vw) + (var(--scene5-progress) * 5vw) );
+            --char-y: calc(50vh + (var(--scene1-progress) * 5vh) + (var(--scene3-progress) * -2vh) + (var(--scene5-progress) * 0vh) );
+            transform: translate(var(--char-x), var(--char-y)) scale(calc(1 + var(--scene1-progress)*0.1)) rotateY(calc(var(--scene1-progress) * -180deg)); /* Turns to face boy */
+        }
+        #girl .head { background-color: var(--girl-color-main); border: 2px solid color-mix(in srgb, var(--girl-color-main) 70%, black);}
+        #girl .body { background-color: var(--girl-color-accent); border: 2px solid color-mix(in srgb, var(--girl-color-accent) 70%, black);}
+        #girl.turned .head { transform: rotateY(180deg); } /* Simplified turn for now */
+
+        /* Scene 1: Separate Worlds / First Glance */
+        .digital-rain-container {
+            position: absolute; top:0; left:0; width:100%; height:100%; overflow:hidden;
+        }
+        .rain-drop {
+            position: absolute;
+            font-size: clamp(10px, 2vw, 18px);
+            font-family: monospace;
+            color: var(--boy-color-accent);
+            opacity: var(--scene1-progress);
+            animation: fall 3s linear infinite;
+            user-select: none;
+        }
+        @keyframes fall {
+            to { transform: translateY(105vh); opacity: 0; }
+        }
+        
+        /* Scene 2: Connection - Data Stream / Chat */
+        .data-stream {
+            position: absolute;
+            width: 3px;
+            height: 50px;
+            background: var(--interactive-glow);
+            border-radius: 3px;
+            opacity: 0;
+            box-shadow: 0 0 10px var(--interactive-glow), 0 0 20px var(--interactive-glow);
+        }
+
+        /* Scene 3: Meeting - Park / Abstract Nature */
+        .pixel-tree {
+            position: absolute;
+            bottom: calc(20vh - var(--scene3-progress) * 10vh); /* Rise up */
+            opacity: var(--scene3-progress);
+            transition: opacity 0.5s;
+        }
+        .pixel-tree .trunk {
+            width: calc(10px + var(--scene3-progress) * 20px);
+            height: calc(50px + var(--scene3-progress) * 50px);
+            background-color: #654321;
+            margin: 0 auto;
+            border-radius: 3px;
+        }
+        .pixel-tree .leaves {
+            width: calc(40px + var(--scene3-progress) * 80px);
+            height: calc(40px + var(--scene3-progress) * 80px);
+            background-color: #2e8b57;
+            border-radius: 50%; /* Softer than pixels for contrast */
+            margin: -10px auto 0;
+            transform: scale(var(--scene3-progress));
+            box-shadow: 0 0 calc(var(--scene3-progress) * 15px) #2e8b57;
+        }
+
+        /* Scene 4: Shared Moments - Abstract Light Show */
+        .light-particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0;
+            transform: scale(0);
+            animation: pulse-light 2s infinite ease-in-out;
+        }
+        @keyframes pulse-light {
+            0%, 100% { transform: scale(calc(var(--scene4-progress) * 0.8)); opacity: calc(var(--scene4-progress) * 0.5); }
+            50% { transform: scale(calc(var(--scene4-progress) * 1.2)); opacity: var(--scene4-progress); }
+        }
+
+        /* Scene 5: Union - Converging Paths / Heart */
+        .heart-particle {
+            position: absolute;
+            width: calc(10px + var(--scene5-progress) * 40px);
+            height: calc(10px + var(--scene5-progress) * 40px);
+            opacity: var(--scene5-progress);
+            transform: translate(-50%, -50%) scale(var(--scene5-progress));
+            background-color: var(--interactive-glow);
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); /* Star shape for now, heart is tricky */
+             /* Simple heart: clip-path: path('M0.5,1 C0.5,1,0,0.7,0,0.3 A0.25,0.25,0,0,1,0.5,0.3 A0.25,0.25,0,0,1,1,0.3 C1,0.7,0.5,1,0.5,1 Z'); */
+            animation: beat 1s infinite ease-in-out;
+            animation-play-state: paused; /* Will be controlled by JS */
+        }
+        #final-heart.active-beat { animation-play-state: running; }
+        @keyframes beat {
+            0%, 100% { transform: translate(-50%, -50%) scale(var(--scene5-progress)); }
+            50% { transform: translate(-50%, -50%) scale(calc(var(--scene5-progress) * 1.2)); }
+        }
+
+        .scroll-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.7);
+            padding: 8px 15px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 20px;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 0.5s;
+        }
+        .scroll-indicator.hidden { opacity: 0; }
+
+
     </style>
 </head>
 <body>
-    <div id="loading-screen">Loading Ephemeral Echoes...</div>
+    <div class="parallax-bg">
+        <!-- Stars will be added by JS -->
+    </div>
+    <div class="scroll-indicator">Scroll to experience their story</div>
 
-    <canvas id="mainCanvas"></canvas>
-    <div class="text-overlay" id="textContainer">
-        <!-- Text will be injected here by JavaScript -->
+    <div class="story-container">
+        <div id="scene1" class="scene">
+            <div class="scene-content">
+                <div class="digital-rain-container"></div>
+                 <div id="boy" class="character">
+                    <div class="head"><div class="eye left"></div><div class="eye right"></div></div>
+                    <div class="body"></div>
+                </div>
+                <div id="girl" class="character">
+                    <div class="head"><div class="eye left"></div><div class="eye right"></div></div>
+                    <div class="body"></div>
+                </div>
+                <div class="narrative-text">In a world of flowing data, two souls drifted apart...</div>
+            </div>
+        </div>
+
+        <div id="scene2" class="scene">
+            <div class="scene-content">
+                <!-- Data streams will be added by JS -->
+                <div class="narrative-text">...until a signal crossed the void, a spark of connection.</div>
+            </div>
+        </div>
+
+        <div id="scene3" class="scene">
+            <div class="scene-content">
+                <div class="pixel-tree" style="left: 30vw;">
+                    <div class="trunk"></div><div class="leaves"></div>
+                </div>
+                <div class="pixel-tree" style="left: 70vw; transform: scale(0.8);">
+                    <div class="trunk"></div><div class="leaves"></div>
+                </div>
+                <div class="narrative-text">A hesitant meeting, in a world beginning to bloom.</div>
+            </div>
+        </div>
+
+        <div id="scene4" class="scene">
+            <div class="scene-content">
+                <!-- Light particles will be added by JS -->
+                <div class="narrative-text">Shared moments painted their world with light and laughter.</div>
+            </div>
+        </div>
+
+        <div id="scene5" class="scene">
+            <div class="scene-content">
+                <div id="final-heart" class="heart-particle"></div>
+                <div class="narrative-text">Their paths converged, two pixels forming one heart.</div>
+            </div>
+        </div>
     </div>
 
-    <div class="instruction" id="mouseInstruction">(Move your mouse)</div>
-
     <script>
-        const canvas = document.getElementById('mainCanvas');
-        const ctx = canvas.getContext('2d');
-        const textContainer = document.getElementById('textContainer');
-        const loadingScreen = document.getElementById('loading-screen');
-        const mouseInstruction = document.getElementById('mouseInstruction');
+        const body = document.body;
+        const storyContainer = document.querySelector('.story-container');
+        const scenes = document.querySelectorAll('.scene');
+        const parallaxBg = document.querySelector('.parallax-bg');
+        const boy = document.getElementById('boy');
+        const girl = document.getElementById('girl');
+        const scrollIndicator = document.querySelector('.scroll-indicator');
 
-        let width, height;
-        let particles = [];
-        let attractors = [];
-        let mouse = { x: null, y: null, active: false };
-        let hue = 0; // For evolving colors
-        let animationFrameId;
-        let currentStage = 0;
-        let stageTimer = 0;
-        const stageDuration = 10 * 1000; // 10 seconds per stage, adjust as needed
-
-        // --- Narrative Stages ---
-        const narrative = [
-            { text: ["In the quiet hum of becoming...", "two solitary whispers."], duration: 12000 },
-            { text: ["One, a gentle warmth,", "a soft bloom in the velvet dark."], colors: { base: 20, range: 20 }, particleType: 'bloom' }, // Warmer hues (reds, oranges)
-            { text: ["The other, a distant shimmer,", "a cool gleam in the infinite expanse."], colors: { base: 200, range: 30 }, particleType: 'shimmer' }, // Cooler hues (blues, cyans)
-            { text: ["A faint stirring...", "an unseen resonance across the void."], colors: { base: 120, range: 60}, particleType: 'mixed' }, // Greens, yellows, broader spectrum
-            { text: ["Threads of light begin to weave,", "pulled by a silent call."], colors: { base: 280, range: 40 }, particleType: 'tendrils' }, // Purples, magentas
-            { text: ["Two streams converge,", "a dance of intertwined echoes."], colors: { base: 0, range: 360 }, particleType: 'intertwined' }, // Full spectrum, very vibrant
-            { text: ["A new luminescence born,", "their shared breath, a vibrant star."], colors: { base: 60, range: 60 }, particleType: 'nova' }, // Golds, whites, bright
-            { text: ["And in that silent song,", "an eternal echo remains."], colors: { base: 240, range: 30}, particleType: 'legacy', duration: 15000 } // Deep blues, silvers, sustained
-        ];
-
-        // --- Particle Class ---
-        class Particle {
-            constructor(x, y, type = 'default') {
-                this.x = x;
-                this.y = y;
-                this.originX = x;
-                this.originY = y;
-                this.size = Math.random() * 3 + 1;
-                this.vx = (Math.random() - 0.5) * 0.5;
-                this.vy = (Math.random() - 0.5) * 0.5;
-                this.baseHue = narrative[currentStage].colors ? narrative[currentStage].colors.base : hue;
-                this.hueRange = narrative[currentStage].colors ? narrative[currentStage].colors.range : 60;
-                this.colorHue = this.baseHue + (Math.random() * this.hueRange - this.hueRange / 2);
-                this.life = Math.random() * 100 + 150; // Lifespan
-                this.initialLife = this.life;
-                this.type = type;
-                this.history = []; // For trails
-                this.maxHistory = Math.floor(Math.random() * 10 + 5);
+        const numStars = 50;
+        for (let i = 0; i < numStars; i++) {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            star.style.width = star.style.height = `${Math.random() * 2 + 1}px`;
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.top = `${Math.random() * 100}%`;
+            star.style.animationDelay = `${Math.random() * 5}s`;
+            parallaxBg.appendChild(star);
+        }
+        
+        const rainContainer = document.querySelector('#scene1 .digital-rain-container');
+        const numRainDrops = 100;
+        if (rainContainer) {
+            for (let i = 0; i < numRainDrops; i++) {
+                const drop = document.createElement('div');
+                drop.classList.add('rain-drop');
+                drop.textContent = String.fromCharCode(33 + Math.floor(Math.random() * 94)); // Random printable char
+                drop.style.left = `${Math.random() * 100}%`;
+                drop.style.top = `${Math.random() * -50 - 50}vh`; // Start off-screen
+                drop.style.animationDelay = `${Math.random() * 3}s`;
+                drop.style.animationDuration = `${Math.random() * 2 + 2}s`;
+                drop.style.color = Math.random() > 0.5 ? 'var(--boy-color-accent)' : 'var(--girl-color-accent)';
+                rainContainer.appendChild(drop);
             }
+        }
 
-            update() {
-                // Attraction/Repulsion (simple for now)
-                attractors.forEach(attractor => {
-                    const dx = attractor.x - this.x;
-                    const dy = attractor.y - this.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < attractor.radius) {
-                        const force = (attractor.radius - dist) / attractor.radius * attractor.strength;
-                        this.vx += (dx / dist) * force * 0.05; // Adjusted force application
-                        this.vy += (dy / dist) * force * 0.05;
-                    }
-                });
-
-                // Mouse interaction
-                if (mouse.active && mouse.x != null) {
-                    const mdx = mouse.x - this.x;
-                    const mdy = mouse.y - this.y;
-                    const mDist = Math.sqrt(mdx * mdx + mdy * mdy);
-                    if (mDist < 100) { // Mouse influence radius
-                        const mForce = (100 - mDist) / 100 * 0.5; // Repulsive force
-                        this.vx -= (mdx / mDist) * mForce;
-                        this.vy -= (mdy / mDist) * mForce;
-                    }
-                }
-
-                this.x += this.vx;
-                this.y += this.vy;
-
-                // Friction/damping
-                this.vx *= 0.97;
-                this.vy *= 0.97;
-
-                // Keep within bounds or fade out
-                if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
-                    this.life -= 5; // Fade faster if out of bounds
-                }
-                
-                this.life--;
-
-                // Update history for trails
-                this.history.push({x: this.x, y: this.y});
-                if (this.history.length > this.maxHistory) {
-                    this.history.shift();
-                }
-            }
-
-            draw() {
-                const alpha = Math.max(0, (this.life / this.initialLife) * 0.8);
-                
-                ctx.beginPath();
-                // Draw trail
-                if (this.history.length > 1) {
-                    ctx.moveTo(this.history[0].x, this.history[0].y);
-                    for (let i = 1; i < this.history.length; i++) {
-                         const histAlpha = alpha * (i / this.history.length);
-                         ctx.strokeStyle = `hsla(${this.colorHue}, 80%, ${60 + (i/this.history.length)*20}%, ${histAlpha * 0.5})`;
-                         ctx.lineWidth = this.size * (i / this.history.length) * 0.8;
-                         ctx.lineTo(this.history[i].x, this.history[i].y);
-                    }
-                    ctx.stroke();
-                }
-
-                // Draw particle head
-                ctx.fillStyle = `hsla(${this.colorHue}, 90%, 70%, ${alpha})`;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Subtle glow
-                ctx.shadowBlur = this.size * 2;
-                ctx.shadowColor = `hsla(${this.colorHue}, 100%, 60%, 0.5)`;
-                ctx.fill(); // Fill again to apply shadow
-                ctx.shadowBlur = 0; // Reset shadow
+        const dataStreams = [];
+        const scene2Content = document.querySelector('#scene2 .scene-content');
+        if (scene2Content) {
+            for (let i = 0; i < 10; i++) {
+                const stream = document.createElement('div');
+                stream.classList.add('data-stream');
+                scene2Content.appendChild(stream);
+                dataStreams.push(stream);
             }
         }
         
-        // --- Attractor Class ---
-        class Attractor {
-            constructor(x, y, radius, strength) {
-                this.x = x;
-                this.y = y;
-                this.radius = radius;
-                this.strength = strength; // Positive for attraction, negative for repulsion
+        const lightParticles = [];
+        const scene4Content = document.querySelector('#scene4 .scene-content');
+        if (scene4Content) {
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('light-particle');
+                particle.style.width = particle.style.height = `${Math.random() * 30 + 10}px`;
+                particle.style.left = `${Math.random() * 90 + 5}%`;
+                particle.style.top = `${Math.random() * 90 + 5}%`;
+                particle.style.backgroundColor = Math.random() > 0.5 ? 'var(--boy-color-main)' : 'var(--girl-color-main)';
+                particle.style.animationDelay = `${Math.random() * 2}s`;
+                scene4Content.appendChild(particle);
+                lightParticles.push(particle);
             }
         }
 
-        // --- Setup ---
-        function setup() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-            particles = [];
-            attractors = [];
-            currentStage = 0;
-            stageTimer = 0;
-            updateNarrative();
-            createInitialAttractors();
-            mouse.active = false; // Mouse inactive initially
-            setTimeout(() => mouse.active = true, 3000); // Activate mouse after a delay
-        }
+        const finalHeart = document.getElementById('final-heart');
 
-        function createInitialAttractors() {
-            attractors = []; // Clear previous
-            const particleType = narrative[currentStage].particleType;
+        let lastScrollY = window.scrollY;
+        let isScrolling;
 
-            if (particleType === 'bloom') {
-                attractors.push(new Attractor(width * 0.3, height * 0.5, Math.min(width, height) * 0.2, 0.2));
-            } else if (particleType === 'shimmer') {
-                attractors.push(new Attractor(width * 0.7, height * 0.5, Math.min(width, height) * 0.2, 0.2));
-            } else if (particleType === 'tendrils' || particleType === 'intertwined') {
-                attractors.push(new Attractor(width * 0.4, height * 0.5, Math.min(width, height) * 0.15, 0.3));
-                attractors.push(new Attractor(width * 0.6, height * 0.5, Math.min(width, height) * 0.15, 0.3));
-            } else if (particleType === 'nova' || particleType === 'legacy') {
-                 attractors.push(new Attractor(width * 0.5, height * 0.5, Math.min(width, height) * 0.25, 0.1)); // Central, softer pull
+        function updateAnimations() {
+            const scrollY = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight;
+            const winHeight = window.innerHeight;
+            const totalScrollableDist = docHeight - winHeight;
+            const globalScrollProgress = Math.min(1, Math.max(0, scrollY / totalScrollableDist));
+
+            body.style.setProperty('--scroll-progress', globalScrollProgress);
+
+            // Update scroll indicator
+            window.clearTimeout(isScrolling);
+            scrollIndicator.classList.remove('hidden');
+            isScrolling = setTimeout(() => {
+                scrollIndicator.classList.add('hidden');
+            }, 1500);
+            if (globalScrollProgress > 0.95) {
+                 scrollIndicator.classList.add('hidden');
             }
-            // For 'mixed' or default, fewer or no specific attractors, more free-floating
-        }
 
-        // --- Narrative Text Update ---
-        function updateNarrative() {
-            textContainer.innerHTML = '';
-            if (narrative[currentStage]) {
-                narrative[currentStage].text.forEach((line, index) => {
-                    const p = document.createElement('p');
-                    p.textContent = line;
-                    if (index === narrative[currentStage].text.length -1 && narrative[currentStage].text.length > 1) {
-                         p.classList.add('small'); // Last line smaller if multiple lines
+
+            scenes.forEach((scene, index) => {
+                const sceneTop = scene.offsetTop;
+                const sceneHeight = scene.offsetHeight; // Should be winHeight
+
+                // Calculate progress within this scene's "active" scroll range
+                // A scene is "active" when its top is at the viewport top, for 1 viewport height
+                const sceneScrollStart = sceneTop;
+                const sceneScrollEnd = sceneTop + winHeight;
+
+                let sceneSpecificProgress = 0;
+                if (scrollY >= sceneScrollStart && scrollY <= sceneScrollEnd) {
+                    sceneSpecificProgress = (scrollY - sceneScrollStart) / winHeight;
+                } else if (scrollY > sceneScrollEnd) {
+                    sceneSpecificProgress = 1;
+                } else {
+                    sceneSpecificProgress = 0;
+                }
+                sceneSpecificProgress = Math.min(1, Math.max(0, sceneSpecificProgress));
+                body.style.setProperty(`--scene${index + 1}-progress`, sceneSpecificProgress);
+
+                // Active class for narrative text
+                // Consider a scene "active" if its center is roughly in the middle of the viewport
+                const sceneCenter = sceneTop + sceneHeight / 2;
+                const viewportCenter = scrollY + winHeight / 2;
+                if (Math.abs(sceneCenter - viewportCenter) < winHeight / 2) {
+                    scene.classList.add('active');
+                } else {
+                    scene.classList.remove('active');
+                }
+
+                // SCENE SPECIFIC LOGIC
+                if (index === 0) { // Scene 1: Separate Worlds
+                    if(sceneSpecificProgress > 0.5) girl.classList.add('turned');
+                    else girl.classList.remove('turned');
+                }
+                if (index === 1 && scene2Content) { // Scene 2: Connection
+                    const boyRect = boy.getBoundingClientRect();
+                    const girlRect = girl.getBoundingClientRect();
+                    
+                    // Calculate positions relative to scene2Content if characters are outside
+                    // For simplicity, assuming characters are visible enough.
+                    // This needs robust calculation of character positions *within* scene2's viewport.
+                    // The current character CSS var system is global, so it might be complex.
+                    // Let's use fixed points if characters aren't easily trackable here.
+                    const boyScreenX = window.innerWidth * 0.25; 
+                    const boyScreenY = window.innerHeight * 0.5;
+                    const girlScreenX = window.innerWidth * 0.75;
+                    const girlScreenY = window.innerHeight * 0.5;
+
+
+                    dataStreams.forEach((stream, i) => {
+                        if (sceneSpecificProgress > 0.1) {
+                            stream.style.opacity = sceneSpecificProgress * 0.8;
+                            const progress = (sceneSpecificProgress - 0.1) / 0.9; // Normalize from 0.1 to 1
+                            const currentX = boyScreenX + (girlScreenX - boyScreenX) * (progress * (i / dataStreams.length + Math.sin(progress * Math.PI * 2 + i) * 0.1));
+                            const currentY = boyScreenY + (girlScreenY - boyScreenY) * (progress * (i / dataStreams.length + Math.cos(progress * Math.PI * 2 + i) * 0.1)) + Math.sin(Date.now() / 200 + i) * 20 * progress;
+                            stream.style.transform = `translate(${currentX}px, ${currentY}px) rotate(${progress * 360}deg) scale(${progress})`;
+                        } else {
+                            stream.style.opacity = 0;
+                        }
+                    });
+                }
+                if (index === 3 && scene4Content) { // Scene 4: Light particles
+                    // Already handled by CSS using --scene4-progress for opacity/scale
+                }
+                 if (index === 4 && finalHeart) { // Scene 5: Union
+                    finalHeart.style.left = `calc(50% + ${Math.sin(Date.now()/500 + sceneSpecificProgress * 5) * sceneSpecificProgress * 5}vw)`;
+                    finalHeart.style.top = `calc(50% + ${Math.cos(Date.now()/400 + sceneSpecificProgress * 5) * sceneSpecificProgress * 5}vh)`;
+                    if(sceneSpecificProgress > 0.7) {
+                        finalHeart.classList.add('active-beat');
+                    } else {
+                        finalHeart.classList.remove('active-beat');
                     }
-                    textContainer.appendChild(p);
-                    // Staggered fade-in for text lines
-                    setTimeout(() => p.classList.add('visible'), index * 1000 + 500);
-                });
-            }
-            createInitialAttractors(); // Recreate attractors based on new stage
-        }
-        
-        // --- Particle Spawning ---
-        function spawnParticles() {
-            const numToSpawn = 2; // Spawn a few particles per frame
-            const particleType = narrative[currentStage].particleType;
-
-            for (let i = 0; i < numToSpawn; i++) {
-                if (particles.length > 300) continue; // Max particles
-
-                let x, y;
-                if (particleType === 'bloom') {
-                    x = width * (0.2 + Math.random() * 0.2); // Leftish side
-                    y = height * (0.4 + Math.random() * 0.2);
-                } else if (particleType === 'shimmer') {
-                    x = width * (0.6 + Math.random() * 0.2); // Rightish side
-                    y = height * (0.4 + Math.random() * 0.2);
-                } else if (particleType === 'tendrils') {
-                    // Spawn from two points moving towards center
-                    x = (Math.random() < 0.5) ? width * (0.1 + Math.random() * 0.1) : width * (0.8 + Math.random() * 0.1);
-                    y = height * (0.3 + Math.random() * 0.4);
-                } else if (particleType === 'intertwined' || particleType === 'nova' || particleType === 'legacy') {
-                    x = width * 0.5 + (Math.random() - 0.5) * width * 0.1; // Centerish
-                    y = height * 0.5 + (Math.random() - 0.5) * height * 0.1;
-                } else { // Default / mixed
-                    x = Math.random() * width;
-                    y = Math.random() * height;
                 }
-                particles.push(new Particle(x, y, particleType));
-            }
-        }
 
-        // --- Animation Loop ---
-        function animate(timestamp) {
-            // Stage progression
-            stageTimer += timestamp - (lastTimestamp || timestamp); // Add delta time
-            lastTimestamp = timestamp;
-
-            const currentStageDuration = (narrative[currentStage] && narrative[currentStage].duration) || stageDuration;
-
-            if (stageTimer >= currentStageDuration) {
-                currentStage++;
-                stageTimer = 0;
-                if (currentStage >= narrative.length) {
-                    currentStage = 0; // Loop narrative or stop
-                    // Or perhaps transition to a final, unending state:
-                    // currentStage = narrative.length - 1; 
-                    // narrative[currentStage].duration = Infinity;
-                }
-                updateNarrative();
-            }
-
-            // Clear canvas with a fading trail effect
-            ctx.fillStyle = 'rgba(3, 3, 8, 0.1)'; // Very dark blue, low alpha for trails
-            ctx.fillRect(0, 0, width, height);
-
-            spawnParticles();
-
-            particles.forEach((p, index) => {
-                p.update();
-                p.draw();
-                if (p.life <= 0) {
-                    particles.splice(index, 1);
-                }
             });
 
-            // Evolve global hue slowly for background subtle shifts (if not overridden by stage)
-            if (!narrative[currentStage].colors) {
-                hue = (hue + 0.1) % 360;
-            }
-            
-            animationFrameId = requestAnimationFrame(animate);
+            // Dynamic background change
+            const bgHue = 240 + globalScrollProgress * 60; // From blue to purple/pink
+            body.style.background = `linear-gradient(135deg, hsl(${bgHue}, 50%, 15%), hsl(${bgHue + 20}, 50%, 10%))`;
+
+
+            requestAnimationFrame(updateAnimations);
         }
-        let lastTimestamp = 0;
 
-        // --- Event Listeners ---
-        window.addEventListener('resize', () => {
-            // Debounce resize
-            clearTimeout(window.resizeTimeout);
-            window.resizeTimeout = setTimeout(() => {
-                cancelAnimationFrame(animationFrameId); // Stop animation
-                setup(); // Re-initialize
-                animationFrameId = requestAnimationFrame(animate); // Restart animation
-            }, 250);
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            if (mouse.active) {
-                mouse.x = e.clientX;
-                mouse.y = e.clientY;
-                if (mouseInstruction.style.opacity !== "0") { // Fade out instruction on first move
-                     mouseInstruction.style.opacity = "0";
-                     mouseInstruction.style.animation = "none"; // Stop animation if it was running
-                }
-            }
-        });
-        window.addEventListener('mouseout', () => {
-            if (mouse.active) {
-                mouse.x = null;
-                mouse.y = null;
-            }
-        });
+        // Initial call & start animation loop
+        requestAnimationFrame(updateAnimations);
         
-        // --- Start ---
-        window.onload = () => {
-            setup();
-            animationFrameId = requestAnimationFrame(animate);
-            // Fade out loading screen
-            setTimeout(() => {
-                loadingScreen.style.opacity = '0';
-                setTimeout(() => loadingScreen.style.display = 'none', 1000);
-            }, 500); // Give a little time for initial setup
-        };
+        // Small delay to ensure all styles are applied before first calc
+        setTimeout(() => {
+            updateAnimations(); 
+            if (window.scrollY === 0) scrollIndicator.classList.remove('hidden'); // Show if at top
+        }, 100);
 
+
+        console.log("Digital Serenade: A Pixel Love Story. Scroll to begin.");
     </script>
 </body>
 </html>
