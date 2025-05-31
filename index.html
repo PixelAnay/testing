@@ -3,381 +3,461 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cosmic Love Story</title>
+    <title>Cosmic Echoes of Love</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Parisienne&family=Cinzel+Decorative:wght@400;700&display=swap');
-
-        :root {
-            --primary-color: #ffc0cb; /* Soft Pink */
-            --secondary-color: #add8e6; /* Light Blue */
-            --accent-color: #ffd700; /* Gold */
-            --text-color: #f0f8ff; /* Alice Blue (very light) */
-            --bg-deep-space: #0a0a23; /* Deep Navy/Black */
-            --bg-nebula-1: #4a0e4e; /* Deep Purple */
-            --bg-nebula-2: #003366; /* Dark Blue */
-        }
-
-        * {
+        /* CSS Reset & Base Styles */
+        *, *::before, *::after {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Parisienne', cursive;
-            background-color: var(--bg-deep-space);
-            color: var(--text-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
-            position: relative;
+        html, body {
+            height: 100%;
+            overflow-x: hidden; /* Prevent horizontal scrollbars */
+            font-family: 'Georgia', serif; /* A more classic, romantic font */
+            background-color: #0a0a1a; /* Deep space blue */
+            color: #e0e0ff; /* Soft lavender text */
+            scroll-behavior: smooth;
         }
 
-        #starsCanvas {
-            position: absolute;
+        body::-webkit-scrollbar {
+            width: 8px;
+        }
+        body::-webkit-scrollbar-track {
+            background: #0a0a1a;
+        }
+        body::-webkit-scrollbar-thumb {
+            background-color: #4a4a8a;
+            border-radius: 20px;
+            border: 2px solid #0a0a1a;
+        }
+
+        canvas {
+            position: fixed;
             top: 0;
             left: 0;
+            z-index: -1; /* Behind content */
             width: 100%;
             height: 100%;
-            z-index: 0;
         }
 
-        .story-container {
-            position: relative;
-            z-index: 1;
+        .scene {
+            min-height: 100vh; /* Each scene takes at least full viewport height */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
             text-align: center;
-            padding: 40px;
-            max-width: 800px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 20px;
-            box-shadow: 0 0 30px rgba(255, 192, 203, 0.3), 0 0 60px rgba(173, 216, 230, 0.3);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
+            position: relative; /* For z-indexing if needed */
             opacity: 0;
             transform: translateY(50px);
-            animation: fadeInStory 2s ease-out 1s forwards;
+            transition: opacity 1.5s ease-out, transform 1.5s ease-out;
         }
 
-        @keyframes fadeInStory {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .scene.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h1, h2, p {
+            max-width: 800px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(200, 200, 255, 0.5);
         }
 
         h1 {
-            font-family: 'Cinzel Decorative', cursive;
-            font-size: 3rem;
-            color: var(--accent-color);
-            margin-bottom: 20px;
-            text-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color);
-            opacity: 0;
-            animation: fadeInText 1.5s ease-out 2s forwards;
+            font-size: 3.5rem;
+            font-weight: normal;
+            color: #f0f0ff;
+            letter-spacing: 2px;
         }
 
-        .verse {
-            font-size: 1.8rem;
-            line-height: 1.8;
-            margin-bottom: 25px;
-            opacity: 0;
-            color: var(--text-color);
-            text-shadow: 0 0 5px var(--primary-color);
-        }
-
-        /* Staggered animation for verses */
-        .verse:nth-child(2) { animation: fadeInText 1.5s ease-out 2.5s forwards; }
-        .verse:nth-child(3) { animation: fadeInText 1.5s ease-out 3.5s forwards; }
-        .verse:nth-child(4) { animation: fadeInText 1.5s ease-out 4.5s forwards; }
-        .verse:nth-child(5) { animation: fadeInText 1.5s ease-out 5.5s forwards; }
-        .verse:nth-child(6) { animation: fadeInText 1.5s ease-out 6.5s forwards; }
-
-
-        @keyframes fadeInText {
-            to {
-                opacity: 1;
-            }
-        }
-
-        .souls-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 30px;
-            position: relative;
-            height: 100px; /* Ensure space for connection line */
-        }
-
-        .soul {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            margin: 0 50px;
-            opacity: 0;
-            box-shadow: 0 0 15px, 0 0 30px;
-            animation: soulAppear 2s ease-out 7s forwards, soulPulse 3s infinite ease-in-out;
-        }
-
-        .soul.her {
-            background-color: var(--primary-color);
-            box-shadow: 0 0 15px var(--primary-color), 0 0 30px var(--primary-color);
-            animation-delay: 7s, 7s; /* Stagger appearance slightly for effect */
-        }
-
-        .soul.him {
-            background-color: var(--secondary-color);
-            box-shadow: 0 0 15px var(--secondary-color), 0 0 30px var(--secondary-color);
-            animation-delay: 7.5s, 7.5s;
-        }
-        
-        @keyframes soulAppear {
-            to {
-                opacity: 0.8;
-            }
-        }
-
-        @keyframes soulPulse {
-            0%, 100% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.1); opacity: 1; }
-        }
-
-        #connectionCanvas {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 200px; /* Width between souls approx */
-            height: 20px; /* Height for the line */
-            opacity: 0;
-            animation: fadeInConnection 1s ease-out 8.5s forwards;
-        }
-
-        @keyframes fadeInConnection {
-            to { opacity: 1; }
-        }
-        
-        .final-message {
+        h2 {
+            font-size: 2rem;
+            font-weight: normal;
+            color: #d0d0f0;
             margin-top: 40px;
-            font-size: 1.5rem;
-            color: var(--accent-color);
-            opacity: 0;
-            animation: fadeInText 2s ease-out 10s forwards;
-             text-shadow: 0 0 8px var(--accent-color);
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            h1 { font-size: 2.2rem; }
-            .verse { font-size: 1.3rem; }
-            .soul { width: 40px; height: 40px; margin: 0 30px; }
-            #connectionCanvas { width: 120px; }
-            .story-container { padding: 20px; }
+        p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #c0c0e0;
         }
-        @media (max-width: 480px) {
-            h1 { font-size: 1.8rem; }
-            .verse { font-size: 1.1rem; }
-            .souls-container { flex-direction: column; height: auto; }
-            .soul { margin: 20px 0; }
-             #connectionCanvas { display: none; /* Simpler on very small screens or would need different logic */ }
-            .final-message { font-size: 1.2rem; }
+
+        .highlight {
+            color: #ffae70; /* Warm contrast */
+            font-style: italic;
+        }
+
+        /* Specific Scene Styling */
+        #scene-intro h1 {
+            animation: pulse-glow 3s infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            from { text-shadow: 0 0 10px rgba(220, 220, 255, 0.7), 0 0 20px rgba(200, 200, 255, 0.5); }
+            to { text-shadow: 0 0 20px rgba(255, 255, 255, 1), 0 0 30px rgba(220, 220, 255, 0.7); }
+        }
+
+        #scene-her .particle-source, #scene-him .particle-source {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            position: absolute;
+            opacity: 0.7;
+            animation: gentle-throb 4s infinite alternate ease-in-out;
+        }
+        
+        #particle-source-her {
+            background: radial-gradient(circle, #ff80b0, #e06090 30%, transparent 70%);
+            left: 20%;
+            top: 40%;
+        }
+        #particle-source-him {
+            background: radial-gradient(circle, #80b0ff, #6090e0 30%, transparent 70%);
+            right: 20%;
+            top: 60%;
+        }
+
+        @keyframes gentle-throb {
+            0% { transform: scale(0.9); box-shadow: 0 0 20px rgba(255,255,255,0.2); }
+            100% { transform: scale(1.1); box-shadow: 0 0 40px rgba(255,255,255,0.4); }
+        }
+
+        #scene-connection .connection-visual {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ffffff, #f0e0ff 40%, #d0b0ff 70%, transparent 90%);
+            box-shadow: 0 0 30px #fff, 0 0 60px #f0e0ff, 0 0 90px #d0b0ff;
+            animation: radiant-burst 5s infinite alternate ease-in-out;
+            margin-bottom: 30px;
+        }
+
+        @keyframes radiant-burst {
+            0% { transform: scale(0.8); opacity: 0.7; box-shadow: 0 0 20px #fff, 0 0 40px #f0e0ff, 0 0 60px #d0b0ff;}
+            100% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 40px #fff, 0 0 80px #f0e0ff, 0 0 120px #d0b0ff;}
+        }
+        
+        #scene-universe .universe-text {
+            transition-delay: 0.5s; /* Delay for text after scene appears */
+        }
+
+        #scene-legacy .legacy-symbol {
+            font-size: 5rem;
+            color: #ffd700; /* Gold */
+            text-shadow: 0 0 15px #ffd700, 0 0 30px #ffae70;
+            animation: slow-spin 20s linear infinite;
+            margin-bottom: 30px;
+        }
+
+        @keyframes slow-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .scroll-down-indicator {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1rem;
+            color: #aaa;
+            animation: bounce 2s infinite;
+        }
+        .scroll-down-indicator::after {
+            content: '▽';
+            display: block;
+            font-size: 1.5rem;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-10px); }
+            60% { transform: translateX(-50%) translateY(-5px); }
+        }
+
+        /* For smaller screens */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            h2 { font-size: 1.8rem; }
+            p { font-size: 1rem; }
+            #particle-source-her, #particle-source-him {
+                width: 60px;
+                height: 60px;
+            }
+            #particle-source-her { left: 10%; top: 30%; }
+            #particle-source-him { right: 10%; top: 70%; }
+
+            #scene-connection .connection-visual {
+                width: 150px;
+                height: 150px;
+            }
         }
 
     </style>
 </head>
 <body>
-    <canvas id="starsCanvas"></canvas>
-    
-    <div class="story-container">
-        <h1>Cosmic Serenade</h1>
-        
-        <p class="verse">In the velvet expanse, where galaxies dream,</p>
-        <p class="verse">Two starlit souls, a luminous stream.</p>
-        <p class="verse">One, a soft nebula, hues of gentle rose,</p>
-        <p class="verse">The other, a comet, where azure light glows.</p>
-        
-        <div class="souls-container">
-            <div class="soul her" id="soulHer"></div>
-            <canvas id="connectionCanvas"></canvas>
-            <div class="soul him" id="soulHim"></div>
-        </div>
-        
-        <p class="verse">Across cosmic oceans, their essence entwined,</p>
-        <p class="verse">A silent promise, for all of humankind.</p>
+    <canvas id="starCanvas"></canvas>
 
-        <p class="final-message">... a universe born from a shared glance ...</p>
-    </div>
+    <section id="scene-intro" class="scene">
+        <h1>Whispers in the Cosmic Dust</h1>
+        <p>In the vast, silent theater of the cosmos, where stars are born and die in breathtaking silence, two nascent lights began to stir. Unaware of each other, yet part of the same grand design.</p>
+        <div class="scroll-down-indicator">Scroll</div>
+    </section>
+
+    <section id="scene-her" class="scene">
+        <div id="particle-source-her" class="particle-source"></div>
+        <h2>Her Solitude, A Gentle Glow</h2>
+        <p>One was a soft luminescence, a <span class="highlight">rose-tinted nebula</span> dreaming in hues of dawn. She danced in gentle orbits, her light a quiet song of hope, a promise of warmth yet to be shared. Her essence, a delicate bloom in the infinite garden of space.</p>
+        <div class="scroll-down-indicator">Scroll</div>
+    </section>
+
+    <section id="scene-him" class="scene">
+        <div id="particle-source-him" class="particle-source"></div>
+        <h2>His Solitude, A Searching Spark</h2>
+        <p>The other, a <span class="highlight">sapphire spark</span>, pulsed with a curious energy. He journeyed through star fields, a seeker, his light a focused beam exploring the darkness, carrying a question only another heart could answer. His spirit, an adventurer charting unknown skies.</p>
+        <div class="scroll-down-indicator">Scroll</div>
+    </section>
+
+    <section id="scene-connection" class="scene">
+        <div class="connection-visual"></div>
+        <h2>The Inevitable Convergence</h2>
+        <p>Across the cosmic expanse, an unseen current drew them. A subtle shift in gravity, a shared frequency in their light. Slowly, then with gathering certainty, their paths began to <span class="highlight">intertwine</span>. The universe held its breath.</p>
+        <p>And then, they met. A collision not of destruction, but of <span class="highlight">creation</span>. Their lights merged, not to extinguish, but to ignite something entirely new. A brilliance that outshone solitary stars.</p>
+        <div class="scroll-down-indicator">Scroll</div>
+    </section>
+
+    <section id="scene-universe" class="scene">
+        <div class="universe-text">
+            <h2>A Universe Born of Two</h2>
+            <p>From their union, a new galaxy swirled into existence. Colors neither had known alone now painted the void. Her gentleness tempered his fire; his seeking found solace in her calm. Together, they wove <span class="highlight">constellations of shared dreams</span>, nebulae of laughter, and star clusters of quiet understanding.</p>
+            <p>Their love was not a destination, but a journey. A continuous dance of giving and receiving, of learning and growing, crafting a shared reality more vibrant and profound than either could have imagined apart.</p>
+        </div>
+        <div class="scroll-down-indicator">Scroll</div>
+    </section>
+
+    <section id="scene-legacy" class="scene">
+        <div class="legacy-symbol">∞</div>
+        <h2>An Eternal Echo</h2>
+        <p>Time, in their shared universe, flowed like a gentle river. Their individual lights, now harmonized, became a beacon for other wandering souls. Their love story, etched into the fabric of spacetime, resonated as an <span class="highlight">eternal echo</span> – a testament that even in the vastness of existence, connection is the most powerful force.</p>
+        <p>Their legacy was not in monuments, but in the enduring warmth they cast upon the cosmos, a genuine light promising that love, in its purest form, is the universe's most beautiful creation.</p>
+    </section>
 
     <script>
-        // Starry background
-        const starsCanvas = document.getElementById('starsCanvas');
-        const starsCtx = starsCanvas.getContext('2d');
-        let stars = [];
-        const numStars = 300;
+        // --- Particle Background ---
+        const canvas = document.getElementById('starCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let herParticles = [];
+        let himParticles = [];
 
-        function setCanvasSize() {
-            starsCanvas.width = window.innerWidth;
-            starsCanvas.height = window.innerHeight;
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
-        function initStars() {
-            stars = [];
-            for (let i = 0; i < numStars; i++) {
-                stars.push({
-                    x: Math.random() * starsCanvas.width,
-                    y: Math.random() * starsCanvas.height,
-                    radius: Math.random() * 1.5 + 0.5, // Star size
-                    alpha: Math.random() * 0.5 + 0.5,  // Star opacity
-                    twinkleSpeed: Math.random() * 0.03 + 0.005, // Twinkle speed
-                    color: `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.3})` // Vary initial brightness slightly
-                });
+        class Particle {
+            constructor(x, y, size, speedX, speedY, color, life = Infinity) {
+                this.x = x;
+                this.y = y;
+                this.size = size;
+                this.speedX = speedX;
+                this.speedY = speedY;
+                this.color = color;
+                this.life = life;
+                this.initialLife = life;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.life !== Infinity) {
+                    this.life--;
+                }
+                // Simple screen wrap for general particles
+                if (this.life === Infinity) {
+                    if (this.x < 0) this.x = canvas.width;
+                    if (this.x > canvas.width) this.x = 0;
+                    if (this.y < 0) this.y = canvas.height;
+                    if (this.y > canvas.height) this.y = 0;
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.life === Infinity ? 0.8 : Math.max(0, this.life / this.initialLife * 0.8);
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
             }
         }
 
-        function drawStars() {
-            starsCtx.clearRect(0, 0, starsCanvas.width, starsCanvas.height);
-            
-            // Add a subtle nebula effect
-            let gradient = starsCtx.createRadialGradient(
-                starsCanvas.width / 2, starsCanvas.height / 2, 0,
-                starsCanvas.width / 2, starsCanvas.height / 2, Math.max(starsCanvas.width, starsCanvas.height) / 1.5
-            );
-            gradient.addColorStop(0, 'rgba(10, 10, 35, 0.1)'); // Center of nebula (darker, transparent)
-            gradient.addColorStop(0.3, 'rgba(74, 14, 78, 0.3)'); // Nebula color 1 (var(--bg-nebula-1) with alpha)
-            gradient.addColorStop(0.6, 'rgba(0, 51, 102, 0.4)');  // Nebula color 2 (var(--bg-nebula-2) with alpha)
-            gradient.addColorStop(1, 'rgba(10, 10, 35, 0.2)');   // Edge of nebula (darker, transparent)
+        function initParticles() {
+            // General stars
+            for (let i = 0; i < 100; i++) {
+                const size = Math.random() * 1.5 + 0.5;
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const speedX = (Math.random() - 0.5) * 0.2;
+                const speedY = (Math.random() - 0.5) * 0.2;
+                particles.push(new Particle(x, y, size, speedX, speedY, 'rgba(220, 220, 255, 0.7)'));
+            }
+        }
 
-            starsCtx.fillStyle = gradient;
-            starsCtx.fillRect(0, 0, starsCanvas.width, starsCanvas.height);
+        let herSourceEl = document.getElementById('particle-source-her');
+        let himSourceEl = document.getElementById('particle-source-him');
+        let connectionVisualEl = document.querySelector('#scene-connection .connection-visual');
 
+        let currentScene = 'intro'; // To control particle emission
 
-            stars.forEach(star => {
-                star.alpha += star.twinkleSpeed;
-                if (star.alpha > 1 || star.alpha < 0.3) {
-                    star.twinkleSpeed *= -1;
+        function emitCharacterParticles() {
+            const herRect = herSourceEl.getBoundingClientRect();
+            const himRect = himSourceEl.getBoundingClientRect();
+            const connectionRect = connectionVisualEl.getBoundingClientRect();
+
+            if (currentScene === 'her' || currentScene === 'solitudes-active') {
+                if (herParticles.length < 50 && Math.random() < 0.3) {
+                    const x = herRect.left + herRect.width / 2;
+                    const y = herRect.top + herRect.height / 2;
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 1 + 0.5;
+                    herParticles.push(new Particle(x, y, Math.random()*2+1, Math.cos(angle)*speed, Math.sin(angle)*speed, 'rgba(255, 128, 176, 0.7)', 100));
                 }
+            }
+            if (currentScene === 'him' || currentScene === 'solitudes-active') {
+                 if (himParticles.length < 50 && Math.random() < 0.3) {
+                    const x = himRect.left + himRect.width / 2;
+                    const y = himRect.top + himRect.height / 2;
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 1 + 0.5;
+                    himParticles.push(new Particle(x, y, Math.random()*2+1, Math.cos(angle)*speed, Math.sin(angle)*speed, 'rgba(128, 176, 255, 0.7)', 100));
+                }
+            }
+            if (currentScene === 'connection' && Math.random() < 0.5) {
+                // Emit from center, mixed colors
+                const x = connectionRect.left + connectionRect.width / 2;
+                const y = connectionRect.top + connectionRect.height / 2;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 1.5 + 1;
+                const color = Math.random() > 0.5 ? 'rgba(255, 128, 176, 0.8)' : 'rgba(128, 176, 255, 0.8)';
+                // Longer life for connection particles
+                particles.push(new Particle(x, y, Math.random()*2.5+1, Math.cos(angle)*speed, Math.sin(angle)*speed, color, 150));
+            }
+            if (currentScene === 'universe' && Math.random() < 0.8) { // More particles for universe
+                // Emit from various places, mixed colors and white
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 0.5 + 0.2;
+                let color = 'rgba(220, 220, 255, 0.6)'; // Default starlight
+                if (Math.random() > 0.6) color = Math.random() > 0.5 ? 'rgba(255, 160, 200, 0.7)' : 'rgba(160, 200, 255, 0.7)'; // Fainter pink/blue
+                particles.push(new Particle(x, y, Math.random()*2+0.5, Math.cos(angle)*speed, Math.sin(angle)*speed, color, 200));
+            }
 
-                starsCtx.beginPath();
-                starsCtx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-                starsCtx.fillStyle = `rgba(255, 215, 0, ${star.alpha * 0.7})`; // Goldish twinkle
-                starsCtx.shadowBlur = star.radius * 3;
-                starsCtx.shadowColor = `rgba(255, 255, 255, ${star.alpha * 0.5})`;
-                starsCtx.fill();
 
-                // Fallback for simple stars if shadow too much
-                // starsCtx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
-                // starsCtx.fill();
+            // Clean up dead character particles
+            herParticles = herParticles.filter(p => p.life > 0);
+            himParticles = himParticles.filter(p => p.life > 0);
+            // Clean up general particles with finite life
+            particles = particles.filter(p => p.life > 0 || p.life === Infinity);
+
+        }
+
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            emitCharacterParticles();
+
+            [...particles, ...herParticles, ...himParticles].forEach(particle => {
+                particle.update();
+                particle.draw();
             });
-            starsCtx.shadowBlur = 0; // Reset shadow
+            
+            requestAnimationFrame(animate);
         }
 
-        function animateStars() {
-            drawStars();
-            requestAnimationFrame(animateStars);
-        }
+        initParticles();
+        animate();
 
-        window.addEventListener('resize', () => {
-            setCanvasSize();
-            initStars(); // Re-initialize stars for new size
+        // --- Scroll-based Scene Transitions & Particle Control ---
+        const scenes = document.querySelectorAll('.scene');
+        const observerOptions = {
+            root: null, // viewport
+            rootMargin: '0px',
+            threshold: 0.4 // 40% of element is visible
+        };
+
+        const sceneObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    
+                    // Update currentScene for particle system
+                    const sceneId = entry.target.id;
+                    if (sceneId === 'scene-intro') currentScene = 'intro';
+                    else if (sceneId === 'scene-her') currentScene = 'her';
+                    else if (sceneId === 'scene-him') currentScene = 'him';
+                    else if (sceneId === 'scene-connection') currentScene = 'connection';
+                    else if (sceneId === 'scene-universe') currentScene = 'universe';
+                    else if (sceneId === 'scene-legacy') currentScene = 'legacy';
+
+                    // Special handling for combined solitude view
+                    const herScene = document.getElementById('scene-her');
+                    const himScene = document.getElementById('scene-him');
+                    if(herScene.classList.contains('visible') && himScene.classList.contains('visible')) {
+                        currentScene = 'solitudes-active'; // Both are visible, emit from both
+                    } else if (herScene.classList.contains('visible')) {
+                        currentScene = 'her';
+                    } else if (himScene.classList.contains('visible')) {
+                        currentScene = 'him';
+                    }
+
+
+                } else {
+                    // Optional: fade out scenes when they scroll out of view
+                    // entry.target.classList.remove('visible'); 
+                    // Be careful with this, could make it flicker if threshold is too sensitive
+                }
+            });
+        }, observerOptions);
+
+        scenes.forEach(scene => {
+            sceneObserver.observe(scene);
         });
 
-        setCanvasSize();
-        initStars();
-        animateStars();
-
-        // Connection Line Animation
-        const connectionCanvas = document.getElementById('connectionCanvas');
-        const connectionCtx = connectionCanvas.getContext('2d');
-        let animationProgress = 0;
-        let animationStartTime;
-
-        function drawConnectionLine(progress) {
-            if (!connectionCanvas) return; // Guard for small screens where it might be hidden
-            connectionCtx.clearRect(0, 0, connectionCanvas.width, connectionCanvas.height);
-            
-            const startX = 0;
-            const endX = connectionCanvas.width;
-            const y = connectionCanvas.height / 2;
-            
-            const currentX = startX + (endX - startX) * progress;
-
-            connectionCtx.beginPath();
-            connectionCtx.moveTo(startX, y);
-            connectionCtx.lineTo(currentX, y);
-            
-            connectionCtx.lineWidth = 3;
-            connectionCtx.strokeStyle = 'rgba(255, 215, 0, 0.8)'; // Gold
-            connectionCtx.shadowColor = 'rgba(255, 215, 0, 1)';
-            connectionCtx.shadowBlur = 10;
-            connectionCtx.stroke();
-
-            // Add a small particle traveling along the line
-            if (progress > 0.1 && progress < 1) {
-                connectionCtx.beginPath();
-                connectionCtx.arc(currentX, y, 4, 0, Math.PI * 2);
-                connectionCtx.fillStyle = 'rgba(255, 255, 255, 1)';
-                connectionCtx.shadowColor = 'rgba(255, 255, 255, 1)';
-                connectionCtx.shadowBlur = 8;
-                connectionCtx.fill();
-            }
-            connectionCtx.shadowBlur = 0; // Reset
-        }
-
-        function animateConnection(timestamp) {
-            if (!connectionCanvas) return;
-            if (!animationStartTime) {
-                animationStartTime = timestamp;
-            }
-            const elapsedTime = timestamp - animationStartTime;
-            const duration = 2000; // 2 seconds for the line to draw
-
-            animationProgress = Math.min(elapsedTime / duration, 1);
-            drawConnectionLine(animationProgress);
-
-            if (animationProgress < 1) {
-                requestAnimationFrame(animateConnection);
-            } else {
-                // Once line is drawn, make it pulse subtly
-                pulseConnection();
-            }
-        }
-        
-        let pulseDirection = 1;
-        let pulseOpacity = 0.8;
-        function pulseConnection() {
-            if (!connectionCanvas) return;
-            connectionCtx.clearRect(0, 0, connectionCanvas.width, connectionCanvas.height);
-            
-            pulseOpacity += 0.01 * pulseDirection;
-            if (pulseOpacity > 1 || pulseOpacity < 0.6) {
-                pulseDirection *= -1;
-            }
-
-            const startX = 0;
-            const endX = connectionCanvas.width;
-            const y = connectionCanvas.height / 2;
-
-            connectionCtx.beginPath();
-            connectionCtx.moveTo(startX, y);
-            connectionCtx.lineTo(endX, y);
-            
-            connectionCtx.lineWidth = 3;
-            connectionCtx.strokeStyle = `rgba(255, 215, 0, ${pulseOpacity})`;
-            connectionCtx.shadowColor = `rgba(255, 215, 0, ${pulseOpacity})`;
-            connectionCtx.shadowBlur = 10 + (pulseOpacity - 0.6) * 10; // More blur when brighter
-            connectionCtx.stroke();
-            connectionCtx.shadowBlur = 0;
-            
-            requestAnimationFrame(pulseConnection);
-        }
-
-
-        // Start connection animation after a delay (sync with CSS fadeInConnection)
+        // Trigger first scene visibility manually if it's already in view on load
+        // (IntersectionObserver might not fire for elements initially in view)
         setTimeout(() => {
-             if (connectionCanvas && getComputedStyle(connectionCanvas).display !== 'none') { // Check if it's visible
-                requestAnimationFrame(animateConnection);
-             }
-        }, 8500); // Must match CSS animation delay for #connectionCanvas
+            const firstScene = document.getElementById('scene-intro');
+            const rect = firstScene.getBoundingClientRect();
+            if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
+                firstScene.classList.add('visible');
+                currentScene = 'intro';
+            }
+        }, 100);
+
+
+        // --- Optional: Smooth scroll for anchor links if you add any ---
+        // document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        //     anchor.addEventListener('click', function (e) {
+        //         e.preventDefault();
+        //         document.querySelector(this.getAttribute('href')).scrollIntoView({
+        //             behavior: 'smooth'
+        //         });
+        //     });
+        // });
+
+        // Console log for a nice message
+        console.log("Cosmic Echoes of Love - A single-file web experience. Crafted with care.");
+        console.log("Scroll down to experience the story unfold.");
 
     </script>
 </body>
