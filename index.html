@@ -3,628 +3,381 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Chronoscape Weaver</title>
+    <title>Cosmic Love Story</title>
     <style>
-        /* --- Universal Reset & Base Styles --- */
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Parisienne&family=Cinzel+Decorative:wght@400;700&display=swap');
 
         :root {
-            --primary-glow: #00f2ff;
-            --secondary-glow: #ff00f2;
-            --tertiary-glow: #f2ff00;
-            --dark-bg: #0a0218; /* Deep cosmic purple */
-            --light-text: #e0e0ff;
-            --accent-text: #a0a0ff;
-            --font-main: 'Orbitron', sans-serif; /* Futuristic font */
-            --font-alt: 'Major Mono Display', monospace; /* More abstract font */
+            --primary-color: #ffc0cb; /* Soft Pink */
+            --secondary-color: #add8e6; /* Light Blue */
+            --accent-color: #ffd700; /* Gold */
+            --text-color: #f0f8ff; /* Alice Blue (very light) */
+            --bg-deep-space: #0a0a23; /* Deep Navy/Black */
+            --bg-nebula-1: #4a0e4e; /* Deep Purple */
+            --bg-nebula-2: #003366; /* Dark Blue */
         }
 
-        @import url('https://fonts.googleapis.com/css2?family=Major+Mono+Display&family=Orbitron:wght@400;700&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
-            font-family: var(--font-main);
-            background-color: var(--dark-bg);
-            color: var(--light-text);
-            overflow-x: hidden; /* Prevent horizontal scroll from weird effects */
-            min-height: 100vh;
+            font-family: 'Parisienne', cursive;
+            background-color: var(--bg-deep-space);
+            color: var(--text-color);
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            perspective: 1000px; /* For 3D effects */
-        }
-
-        /* --- Global Helper Classes --- */
-        .hidden { display: none !important; }
-        .text-center { text-align: center; }
-        .section-padding { padding: 60px 20px; }
-
-        /* --- Animated Background --- */
-        .cosmic-background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-            background: linear-gradient(
-                45deg, 
-                rgba(10, 2, 24, 0.95), /* var(--dark-bg) with slight transparency */
-                rgba(2, 10, 24, 0.95),
-                rgba(24, 2, 10, 0.95)
-            );
-            background-size: 400% 400%;
-            animation: gradientShift 25s ease infinite;
-        }
-
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* --- Starfield --- */
-        #starfield {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        /* --- Header / Navigation --- */
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            padding: 20px 40px;
-            z-index: 1000;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(10, 2, 24, 0.5);
-            backdrop-filter: blur(5px);
-            border-bottom: 1px solid rgba(0, 242, 255, 0.2);
-        }
-
-        header .logo {
-            font-family: var(--font-alt);
-            font-size: 1.8em;
-            color: var(--primary-glow);
-            text-shadow: 0 0 10px var(--primary-glow);
-            cursor: default;
-        }
-
-        header nav a {
-            color: var(--light-text);
-            text-decoration: none;
-            margin-left: 25px;
-            font-size: 1em;
-            transition: color 0.3s, text-shadow 0.3s;
-        }
-
-        header nav a:hover {
-            color: var(--secondary-glow);
-            text-shadow: 0 0 8px var(--secondary-glow);
-        }
-
-        /* --- Hero Section --- */
-        #hero {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            text-align: center;
+            min-height: 100vh;
+            overflow: hidden;
             position: relative;
-            padding: 20px;
         }
 
-        #hero h1 {
-            font-size: clamp(2.5rem, 8vw, 5rem); /* Responsive font size */
-            font-family: var(--font-alt);
-            margin-bottom: 20px;
-            color: var(--primary-glow);
-            text-shadow: 
-                0 0 15px var(--primary-glow),
-                0 0 30px var(--primary-glow),
-                0 0 45px rgba(0, 242, 255, 0.5);
-            animation: pulseGlow 3s infinite alternate;
+        #starsCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
         }
 
-        @keyframes pulseGlow {
-            from { text-shadow: 0 0 10px var(--primary-glow), 0 0 20px var(--primary-glow); opacity: 0.8; }
-            to { text-shadow: 0 0 20px var(--primary-glow), 0 0 40px var(--primary-glow), 0 0 60px rgba(0, 242, 255, 0.7); opacity: 1; }
-        }
-
-        #hero p {
-            font-size: clamp(1rem, 3vw, 1.5rem);
-            max-width: 700px;
-            color: var(--accent-text);
-            line-height: 1.7;
-            margin-bottom: 30px;
-            animation: fadeIn 2s ease-out forwards;
+        .story-container {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 40px;
+            max-width: 800px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(255, 192, 203, 0.3), 0 0 60px rgba(173, 216, 230, 0.3);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
             opacity: 0;
+            transform: translateY(50px);
+            animation: fadeInStory 2s ease-out 1s forwards;
         }
 
-        @keyframes fadeIn {
+        @keyframes fadeInStory {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-family: 'Cinzel Decorative', cursive;
+            font-size: 3rem;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color);
+            opacity: 0;
+            animation: fadeInText 1.5s ease-out 2s forwards;
+        }
+
+        .verse {
+            font-size: 1.8rem;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            opacity: 0;
+            color: var(--text-color);
+            text-shadow: 0 0 5px var(--primary-color);
+        }
+
+        /* Staggered animation for verses */
+        .verse:nth-child(2) { animation: fadeInText 1.5s ease-out 2.5s forwards; }
+        .verse:nth-child(3) { animation: fadeInText 1.5s ease-out 3.5s forwards; }
+        .verse:nth-child(4) { animation: fadeInText 1.5s ease-out 4.5s forwards; }
+        .verse:nth-child(5) { animation: fadeInText 1.5s ease-out 5.5s forwards; }
+        .verse:nth-child(6) { animation: fadeInText 1.5s ease-out 6.5s forwards; }
+
+
+        @keyframes fadeInText {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .souls-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+            position: relative;
+            height: 100px; /* Ensure space for connection line */
+        }
+
+        .soul {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 0 50px;
+            opacity: 0;
+            box-shadow: 0 0 15px, 0 0 30px;
+            animation: soulAppear 2s ease-out 7s forwards, soulPulse 3s infinite ease-in-out;
+        }
+
+        .soul.her {
+            background-color: var(--primary-color);
+            box-shadow: 0 0 15px var(--primary-color), 0 0 30px var(--primary-color);
+            animation-delay: 7s, 7s; /* Stagger appearance slightly for effect */
+        }
+
+        .soul.him {
+            background-color: var(--secondary-color);
+            box-shadow: 0 0 15px var(--secondary-color), 0 0 30px var(--secondary-color);
+            animation-delay: 7.5s, 7.5s;
+        }
+        
+        @keyframes soulAppear {
+            to {
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes soulPulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        #connectionCanvas {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px; /* Width between souls approx */
+            height: 20px; /* Height for the line */
+            opacity: 0;
+            animation: fadeInConnection 1s ease-out 8.5s forwards;
+        }
+
+        @keyframes fadeInConnection {
             to { opacity: 1; }
         }
-
-        .cta-button {
-            padding: 15px 30px;
-            font-size: 1.1em;
-            font-family: var(--font-main);
-            color: var(--dark-bg);
-            background-color: var(--primary-glow);
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-            box-shadow: 0 0 10px var(--primary-glow), 0 0 20px rgba(0, 242, 255, 0.5);
-            animation: fadeIn 2s ease-out 0.5s forwards;
-            opacity: 0;
-        }
-
-        .cta-button:hover {
-            transform: translateY(-5px) scale(1.05);
-            background-color: var(--secondary-glow);
-            box-shadow: 0 0 15px var(--secondary-glow), 0 0 30px rgba(255, 0, 242, 0.7);
-        }
-
-        /* --- Content Sections --- */
-        .content-section {
-            width: 100%;
-            max-width: 1000px; /* Content width */
-            margin: 50px auto;
-            padding: 40px;
-            background: rgba(20, 5, 40, 0.6); /* Slightly different bg */
-            border: 1px solid rgba(var(--secondary-glow-rgb, 255,0,242), 0.3);
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            backdrop-filter: blur(3px);
-            transform-style: preserve-3d; /* For children elements */
-        }
-
-        .content-section h2 {
-            font-size: 2.5em;
-            font-family: var(--font-alt);
-            color: var(--secondary-glow);
-            text-shadow: 0 0 10px var(--secondary-glow);
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .content-section p {
-            font-size: 1.1em;
-            line-height: 1.8;
-            margin-bottom: 20px;
-            color: var(--light-text);
-        }
-
-        /* --- Shifting Realities Section --- */
-        #shifting-realities .reality-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .reality-shard {
-            background: rgba(30, 10, 60, 0.7);
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid rgba(var(--tertiary-glow-rgb, 242,255,0), 0.3);
-            box-shadow: 0 0 15px rgba(var(--tertiary-glow-rgb, 242,255,0), 0.2);
-            transition: transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1), box-shadow 0.5s;
-            cursor: pointer;
-        }
-
-        .reality-shard:hover {
-            transform: translateY(-10px) rotateX(5deg) rotateY(-3deg) scale(1.03);
-            box-shadow: 0 10px 25px rgba(var(--tertiary-glow-rgb, 242,255,0), 0.4);
-        }
-
-        .reality-shard h3 {
-            font-size: 1.5em;
-            color: var(--tertiary-glow);
-            margin-bottom: 10px;
-        }
-
-        /* --- Time Crystals Section --- */
-        #time-crystals .crystal-container {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 30px;
+        
+        .final-message {
             margin-top: 40px;
-            min-height: 200px; /* Ensure space for crystals */
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            opacity: 0;
+            animation: fadeInText 2s ease-out 10s forwards;
+             text-shadow: 0 0 8px var(--accent-color);
         }
 
-        .time-crystal {
-            width: 100px;
-            height: 100px;
-            position: relative;
-            transform-style: preserve-3d;
-            animation: floatRotate 15s infinite linear;
-        }
-
-        .crystal-face {
-            position: absolute;
-            width: 100px;
-            height: 100px;
-            background: rgba(0, 242, 255, 0.2);
-            border: 1px solid var(--primary-glow);
-            opacity: 0.7;
-            box-shadow: inset 0 0 10px var(--primary-glow);
-        }
-
-        /* D8 - Octahedron (approximation) */
-        .front  { transform: rotateY(  0deg) translateZ(50px); }
-        .back   { transform: rotateY(180deg) translateZ(50px); }
-        .right  { transform: rotateY( 90deg) translateZ(50px); }
-        .left   { transform: rotateY(-90deg) translateZ(50px); }
-        .top    { transform: rotateX( 90deg) translateZ(50px); }
-        .bottom { transform: rotateX(-90deg) translateZ(50px); }
-        /* Additional faces for more crystal-like appearance, slightly offset/rotated */
-        .face7 { transform: rotateY(45deg) rotateX(45deg) translateZ(50px); background: rgba(255, 0, 242, 0.2); border-color:var(--secondary-glow); box-shadow: inset 0 0 10px var(--secondary-glow);}
-        .face8 { transform: rotateY(-45deg) rotateX(-45deg) translateZ(50px); background: rgba(242, 255, 0, 0.2); border-color:var(--tertiary-glow); box-shadow: inset 0 0 10px var(--tertiary-glow);}
-
-
-        @keyframes floatRotate {
-            0% { transform: translateY(0px) rotateX(0deg) rotateY(0deg); }
-            25% { transform: translateY(-15px) rotateX(90deg) rotateY(90deg); }
-            50% { transform: translateY(0px) rotateX(180deg) rotateY(180deg); }
-            75% { transform: translateY(15px) rotateX(270deg) rotateY(270deg); }
-            100% { transform: translateY(0px) rotateX(360deg) rotateY(360deg); }
-        }
-
-        .time-crystal:nth-child(2) { animation-delay: -5s; }
-        .time-crystal:nth-child(3) { animation-delay: -10s; }
-
-
-        /* --- Interactive Data Stream --- */
-        #data-stream {
-            position: relative;
-            min-height: 300px;
-            overflow: hidden; /* Contain the falling characters */
-        }
-
-        .data-char {
-            position: absolute;
-            font-family: var(--font-alt);
-            font-size: 1.2em;
-            user-select: none;
-            animation: fall 5s linear infinite;
-            opacity: 0; /* Start hidden, JS will make visible */
-        }
-
-        @keyframes fall {
-            0% { transform: translateY(-20px); opacity: 1; }
-            90% { opacity: 0.8; }
-            100% { transform: translateY(calc(100% + 300px)); opacity: 0; } /* Fall below view */
-        }
-
-        /* --- Footer --- */
-        footer {
-            width: 100%;
-            padding: 30px 20px;
-            text-align: center;
-            margin-top: 50px;
-            background: rgba(10, 2, 24, 0.7);
-            border-top: 1px solid rgba(0, 242, 255, 0.2);
-        }
-        footer p {
-            color: var(--accent-text);
-            font-size: 0.9em;
-        }
-        footer a {
-            color: var(--primary-glow);
-            text-decoration: none;
-        }
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* --- Scrollbar Styling (for a bit more theme consistency) --- */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--dark-bg);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary-glow);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--secondary-glow);
-        }
-
-
-        /* --- Responsive Adjustments --- */
+        /* Responsive adjustments */
         @media (max-width: 768px) {
-            header {
-                padding: 15px 20px;
-                flex-direction: column;
-                align-items: center;
-            }
-            header .logo {
-                margin-bottom: 10px;
-            }
-            header nav a {
-                margin: 0 10px;
-            }
-            .content-section {
-                padding: 30px 15px;
-            }
-            .content-section h2 {
-                font-size: 2em;
-            }
-            .time-crystal {
-                width: 80px;
-                height: 80px;
-            }
-            .crystal-face {
-                width: 80px;
-                height: 80px;
-            }
-            .front, .back, .right, .left, .top, .bottom, .face7, .face8 { 
-                transform-origin: 40px 40px; /* Adjust for smaller size */
-            }
-            .front  { transform: rotateY(  0deg) translateZ(40px); }
-            .back   { transform: rotateY(180deg) translateZ(40px); }
-            .right  { transform: rotateY( 90deg) translateZ(40px); }
-            .left   { transform: rotateY(-90deg) translateZ(40px); }
-            .top    { transform: rotateX( 90deg) translateZ(40px); }
-            .bottom { transform: rotateX(-90deg) translateZ(40px); }
-            .face7 { transform: rotateY(45deg) rotateX(45deg) translateZ(40px); }
-            .face8 { transform: rotateY(-45deg) rotateX(-45deg) translateZ(40px); }
+            h1 { font-size: 2.2rem; }
+            .verse { font-size: 1.3rem; }
+            .soul { width: 40px; height: 40px; margin: 0 30px; }
+            #connectionCanvas { width: 120px; }
+            .story-container { padding: 20px; }
+        }
+        @media (max-width: 480px) {
+            h1 { font-size: 1.8rem; }
+            .verse { font-size: 1.1rem; }
+            .souls-container { flex-direction: column; height: auto; }
+            .soul { margin: 20px 0; }
+             #connectionCanvas { display: none; /* Simpler on very small screens or would need different logic */ }
+            .final-message { font-size: 1.2rem; }
         }
 
     </style>
 </head>
 <body>
-    <div class="cosmic-background"></div>
-    <canvas id="starfield"></canvas>
-
-    <header>
-        <div class="logo">CHRONOSCAPE</div>
-        <nav>
-            <a href="#hero">Genesis</a>
-            <a href="#shifting-realities">Realities</a>
-            <a href="#time-crystals">Crystals</a>
-            <a href="#data-stream-section">Echoes</a>
-        </nav>
-    </header>
-
-    <main>
-        <section id="hero">
-            <h1>The Chronoscape Weaver</h1>
-            <p>Peer into the fabric of fractured time. Witness echoes of what was, what is, and what might become. Your journey through the abstract begins now.</p>
-            <a href="#shifting-realities" class="cta-button">Explore the Shards</a>
-        </section>
-
-        <section id="shifting-realities" class="content-section section-padding">
-            <h2>Shifting Realities</h2>
-            <p>Each shard a glimpse into a potential timeline, a forgotten memory, or a future yet unwritten. They shimmer with untold stories, responding to your presence.</p>
-            <div class="reality-grid">
-                <div class="reality-shard">
-                    <h3>The Obsidian Past</h3>
-                    <p>Frozen moments from a world long gone, encased in temporal obsidian.</p>
-                </div>
-                <div class="reality-shard">
-                    <h3>Neon Futures</h3>
-                    <p>Vibrant, chaotic possibilities of what tomorrow might hold.</p>
-                </div>
-                <div class="reality-shard">
-                    <h3>Whispering Voids</h3>
-                    <p>The spaces between time, where silence speaks volumes.</p>
-                </div>
-                 <div class="reality-shard">
-                    <h3>Echoes of Choice</h3>
-                    <p>Reflections of paths not taken, diverging into infinity.</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="time-crystals" class="content-section section-padding">
-            <h2>Time Crystals</h2>
-            <p>Crystalline structures humming with temporal energy. They resonate with the flow of the chronoscape, each facet reflecting a different aspect of existence.</p>
-            <div class="crystal-container">
-                <div class="time-crystal">
-                    <div class="crystal-face front"></div>
-                    <div class="crystal-face back"></div>
-                    <div class="crystal-face right"></div>
-                    <div class="crystal-face left"></div>
-                    <div class="crystal-face top"></div>
-                    <div class="crystal-face bottom"></div>
-                    <div class="crystal-face face7"></div>
-                    <div class="crystal-face face8"></div>
-                </div>
-                <div class="time-crystal">
-                    <div class="crystal-face front"></div>
-                    <div class="crystal-face back"></div>
-                    <div class="crystal-face right"></div>
-                    <div class="crystal-face left"></div>
-                    <div class="crystal-face top"></div>
-                    <div class="crystal-face bottom"></div>
-                    <div class="crystal-face face7"></div>
-                    <div class="crystal-face face8"></div>
-                </div>
-                 <div class="time-crystal">
-                    <div class="crystal-face front"></div>
-                    <div class="crystal-face back"></div>
-                    <div class="crystal-face right"></div>
-                    <div class="crystal-face left"></div>
-                    <div class="crystal-face top"></div>
-                    <div class="crystal-face bottom"></div>
-                    <div class="crystal-face face7"></div>
-                    <div class="crystal-face face8"></div>
-                </div>
-            </div>
-        </section>
+    <canvas id="starsCanvas"></canvas>
+    
+    <div class="story-container">
+        <h1>Cosmic Serenade</h1>
         
-        <section id="data-stream-section" class="content-section section-padding">
-            <h2>Echoes & Fragments</h2>
-            <p>Listen closely. The chronoscape whispers forgotten data, fragmented memories, and nascent ideas. Hover to glimpse these fleeting echoes.</p>
-            <div id="data-stream">
-                <!-- JS will populate this -->
-            </div>
-        </section>
+        <p class="verse">In the velvet expanse, where galaxies dream,</p>
+        <p class="verse">Two starlit souls, a luminous stream.</p>
+        <p class="verse">One, a soft nebula, hues of gentle rose,</p>
+        <p class="verse">The other, a comet, where azure light glows.</p>
+        
+        <div class="souls-container">
+            <div class="soul her" id="soulHer"></div>
+            <canvas id="connectionCanvas"></canvas>
+            <div class="soul him" id="soulHim"></div>
+        </div>
+        
+        <p class="verse">Across cosmic oceans, their essence entwined,</p>
+        <p class="verse">A silent promise, for all of humankind.</p>
 
-    </main>
-
-    <footer>
-        <p>© <span id="currentYear"></span> The Chronoscape Weaver. Crafted in the ethereal mists of code.</p>
-        <p>A single-file experiment by an AI and a curious human.</p>
-    </footer>
+        <p class="final-message">... a universe born from a shared glance ...</p>
+    </div>
 
     <script>
-        // --- Starfield Effect ---
-        const starfield = document.getElementById('starfield');
-        const ctx = starfield.getContext('2d');
+        // Starry background
+        const starsCanvas = document.getElementById('starsCanvas');
+        const starsCtx = starsCanvas.getContext('2d');
         let stars = [];
-        const numStars = 200;
+        const numStars = 300;
 
         function setCanvasSize() {
-            starfield.width = window.innerWidth;
-            starfield.height = window.innerHeight;
-        }
-        setCanvasSize();
-        window.addEventListener('resize', setCanvasSize);
-
-        class Star {
-            constructor() {
-                this.x = Math.random() * starfield.width;
-                this.y = Math.random() * starfield.height;
-                this.size = Math.random() * 1.5 + 0.5; // Star size
-                this.speed = Math.random() * 0.5 + 0.1; // Star speed
-                this.opacity = Math.random() * 0.5 + 0.5; // Star opacity
-            }
-
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(224, 224, 255, ${this.opacity})`; // var(--light-text)
-                ctx.fill();
-            }
-
-            update() {
-                this.y += this.speed;
-                if (this.y > starfield.height) {
-                    this.y = 0;
-                    this.x = Math.random() * starfield.width;
-                }
-                this.draw();
-            }
+            starsCanvas.width = window.innerWidth;
+            starsCanvas.height = window.innerHeight;
         }
 
         function initStars() {
             stars = [];
             for (let i = 0; i < numStars; i++) {
-                stars.push(new Star());
+                stars.push({
+                    x: Math.random() * starsCanvas.width,
+                    y: Math.random() * starsCanvas.height,
+                    radius: Math.random() * 1.5 + 0.5, // Star size
+                    alpha: Math.random() * 0.5 + 0.5,  // Star opacity
+                    twinkleSpeed: Math.random() * 0.03 + 0.005, // Twinkle speed
+                    color: `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.3})` // Vary initial brightness slightly
+                });
             }
         }
 
+        function drawStars() {
+            starsCtx.clearRect(0, 0, starsCanvas.width, starsCanvas.height);
+            
+            // Add a subtle nebula effect
+            let gradient = starsCtx.createRadialGradient(
+                starsCanvas.width / 2, starsCanvas.height / 2, 0,
+                starsCanvas.width / 2, starsCanvas.height / 2, Math.max(starsCanvas.width, starsCanvas.height) / 1.5
+            );
+            gradient.addColorStop(0, 'rgba(10, 10, 35, 0.1)'); // Center of nebula (darker, transparent)
+            gradient.addColorStop(0.3, 'rgba(74, 14, 78, 0.3)'); // Nebula color 1 (var(--bg-nebula-1) with alpha)
+            gradient.addColorStop(0.6, 'rgba(0, 51, 102, 0.4)');  // Nebula color 2 (var(--bg-nebula-2) with alpha)
+            gradient.addColorStop(1, 'rgba(10, 10, 35, 0.2)');   // Edge of nebula (darker, transparent)
+
+            starsCtx.fillStyle = gradient;
+            starsCtx.fillRect(0, 0, starsCanvas.width, starsCanvas.height);
+
+
+            stars.forEach(star => {
+                star.alpha += star.twinkleSpeed;
+                if (star.alpha > 1 || star.alpha < 0.3) {
+                    star.twinkleSpeed *= -1;
+                }
+
+                starsCtx.beginPath();
+                starsCtx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                starsCtx.fillStyle = `rgba(255, 215, 0, ${star.alpha * 0.7})`; // Goldish twinkle
+                starsCtx.shadowBlur = star.radius * 3;
+                starsCtx.shadowColor = `rgba(255, 255, 255, ${star.alpha * 0.5})`;
+                starsCtx.fill();
+
+                // Fallback for simple stars if shadow too much
+                // starsCtx.fillStyle = `rgba(255, 255, 255, ${star.alpha})`;
+                // starsCtx.fill();
+            });
+            starsCtx.shadowBlur = 0; // Reset shadow
+        }
+
         function animateStars() {
-            ctx.clearRect(0, 0, starfield.width, starfield.height);
-            stars.forEach(star => star.update());
+            drawStars();
             requestAnimationFrame(animateStars);
         }
 
+        window.addEventListener('resize', () => {
+            setCanvasSize();
+            initStars(); // Re-initialize stars for new size
+        });
+
+        setCanvasSize();
         initStars();
         animateStars();
 
+        // Connection Line Animation
+        const connectionCanvas = document.getElementById('connectionCanvas');
+        const connectionCtx = connectionCanvas.getContext('2d');
+        let animationProgress = 0;
+        let animationStartTime;
 
-        // --- Smooth Scroll for Nav Links ---
-        document.querySelectorAll('header nav a').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('href');
-                const targetElement = document.querySelector(targetId);
-                if (targetElement) {
-                    targetElement.scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                }
-            });
-        });
-
-        // --- Reality Shard Interaction (simple example) ---
-        const shards = document.querySelectorAll('.reality-shard');
-        shards.forEach(shard => {
-            shard.addEventListener('click', () => {
-                // Could expand this to show a modal, change content, etc.
-                console.log(`Glimpsed into: ${shard.querySelector('h3').textContent}`);
-                shard.style.borderColor = 'var(--primary-glow)';
-                setTimeout(() => shard.style.borderColor = 'rgba(var(--tertiary-glow-rgb, 242,255,0), 0.3)', 1000);
-            });
-        });
-
-        // --- Interactive Data Stream ---
-        const dataStreamContainer = document.getElementById('data-stream');
-        const possibleChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789{}[]():;<>?|*&^%$#@!";
-        const streamColors = ['var(--primary-glow)', 'var(--secondary-glow)', 'var(--tertiary-glow)', 'var(--light-text)'];
-
-        function createDataChar() {
-            if (!dataStreamContainer) return; // Guard if element not found
-
-            const charSpan = document.createElement('span');
-            charSpan.classList.add('data-char');
-            charSpan.textContent = possibleChars[Math.floor(Math.random() * possibleChars.length)];
-            charSpan.style.left = `${Math.random() * 95}%`; // % to be relative to container
-            charSpan.style.top = `${Math.random() * -50}px`; // Start above the container
-            charSpan.style.color = streamColors[Math.floor(Math.random() * streamColors.length)];
-            charSpan.style.animationDuration = `${Math.random() * 3 + 4}s`; // 4-7 seconds
-            charSpan.style.animationDelay = `${Math.random() * 2}s`; // Stagger start times
+        function drawConnectionLine(progress) {
+            if (!connectionCanvas) return; // Guard for small screens where it might be hidden
+            connectionCtx.clearRect(0, 0, connectionCanvas.width, connectionCanvas.height);
             
-            dataStreamContainer.appendChild(charSpan);
+            const startX = 0;
+            const endX = connectionCanvas.width;
+            const y = connectionCanvas.height / 2;
+            
+            const currentX = startX + (endX - startX) * progress;
 
-            // Clean up old characters to prevent DOM overload
-            charSpan.addEventListener('animationend', () => {
-                charSpan.remove();
-            });
+            connectionCtx.beginPath();
+            connectionCtx.moveTo(startX, y);
+            connectionCtx.lineTo(currentX, y);
+            
+            connectionCtx.lineWidth = 3;
+            connectionCtx.strokeStyle = 'rgba(255, 215, 0, 0.8)'; // Gold
+            connectionCtx.shadowColor = 'rgba(255, 215, 0, 1)';
+            connectionCtx.shadowBlur = 10;
+            connectionCtx.stroke();
+
+            // Add a small particle traveling along the line
+            if (progress > 0.1 && progress < 1) {
+                connectionCtx.beginPath();
+                connectionCtx.arc(currentX, y, 4, 0, Math.PI * 2);
+                connectionCtx.fillStyle = 'rgba(255, 255, 255, 1)';
+                connectionCtx.shadowColor = 'rgba(255, 255, 255, 1)';
+                connectionCtx.shadowBlur = 8;
+                connectionCtx.fill();
+            }
+            connectionCtx.shadowBlur = 0; // Reset
+        }
+
+        function animateConnection(timestamp) {
+            if (!connectionCanvas) return;
+            if (!animationStartTime) {
+                animationStartTime = timestamp;
+            }
+            const elapsedTime = timestamp - animationStartTime;
+            const duration = 2000; // 2 seconds for the line to draw
+
+            animationProgress = Math.min(elapsedTime / duration, 1);
+            drawConnectionLine(animationProgress);
+
+            if (animationProgress < 1) {
+                requestAnimationFrame(animateConnection);
+            } else {
+                // Once line is drawn, make it pulse subtly
+                pulseConnection();
+            }
         }
         
-        // Start data stream if container exists
-        if (dataStreamContainer) {
-            setInterval(createDataChar, 150); // Create a new char every 150ms
+        let pulseDirection = 1;
+        let pulseOpacity = 0.8;
+        function pulseConnection() {
+            if (!connectionCanvas) return;
+            connectionCtx.clearRect(0, 0, connectionCanvas.width, connectionCanvas.height);
+            
+            pulseOpacity += 0.01 * pulseDirection;
+            if (pulseOpacity > 1 || pulseOpacity < 0.6) {
+                pulseDirection *= -1;
+            }
+
+            const startX = 0;
+            const endX = connectionCanvas.width;
+            const y = connectionCanvas.height / 2;
+
+            connectionCtx.beginPath();
+            connectionCtx.moveTo(startX, y);
+            connectionCtx.lineTo(endX, y);
+            
+            connectionCtx.lineWidth = 3;
+            connectionCtx.strokeStyle = `rgba(255, 215, 0, ${pulseOpacity})`;
+            connectionCtx.shadowColor = `rgba(255, 215, 0, ${pulseOpacity})`;
+            connectionCtx.shadowBlur = 10 + (pulseOpacity - 0.6) * 10; // More blur when brighter
+            connectionCtx.stroke();
+            connectionCtx.shadowBlur = 0;
+            
+            requestAnimationFrame(pulseConnection);
         }
 
 
-        // --- Dynamic RGB values for CSS variables (if needed for JS manipulation) ---
-        // This is mainly for if you wanted to dynamically change these from JS.
-        // For the current setup, direct CSS var usage is fine.
-        function setRGBVars() {
-            const rootStyle = document.documentElement.style;
-            rootStyle.setProperty('--primary-glow-rgb', '0,242,255');
-            rootStyle.setProperty('--secondary-glow-rgb', '255,0,242');
-            rootStyle.setProperty('--tertiary-glow-rgb', '242,255,0');
-        }
-        setRGBVars();
-
-
-        // --- Current Year for Footer ---
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
-
-        // --- Console Art ---
-        console.log(
-            "%c🌌 Chronoscape Weaver Initialized 🌌",
-            "font-size: 20px; color: #00f2ff; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 5px #00f2ff;"
-        );
-        console.log(
-            "%cWelcome, traveler. The echoes of time await your exploration.",
-            "font-size: 12px; color: #a0a0ff; font-family: 'Major Mono Display', monospace;"
-        );
+        // Start connection animation after a delay (sync with CSS fadeInConnection)
+        setTimeout(() => {
+             if (connectionCanvas && getComputedStyle(connectionCanvas).display !== 'none') { // Check if it's visible
+                requestAnimationFrame(animateConnection);
+             }
+        }, 8500); // Must match CSS animation delay for #connectionCanvas
 
     </script>
 </body>
