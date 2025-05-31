@@ -3,688 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Thread of Destiny</title>
+    <title>Pop-up Overload</title>
     <style>
-        :root {
-            --scroll-progress: 0;
-            --primary-color-girl: #ff80c0; /* Vibrant Pink */
-            --secondary-color-girl: #ffc0e0; /* Light Pink */
-            --primary-color-boy: #80bfff;  /* Vibrant Blue */
-            --secondary-color-boy: #c0dfff;  /* Light Blue */
-            --connection-color: #d0a0ff; /* Lavender */
-            --background-start: #080812;
-            --background-end: #1a1a30;
-        }
-
-        *, *::before, *::after {
-            box-sizing: border-box;
+        body {
+            background-color: #1a1a1a; /* Dark background, like some "hacker" UIs */
             margin: 0;
             padding: 0;
+            overflow: hidden; /* Hide scrollbars that might appear due to off-screen popups */
+            font-family: 'Courier New', Courier, monospace; /* A "techy" font */
+            color: #00ff00; /* Green text for a "hacker" feel */
         }
 
-        html {
-            scroll-behavior: smooth; /* Less important if JS controls scroll heavily */
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif; /* Modern, clean font */
-            background: linear-gradient(135deg, var(--background-start), var(--background-end));
-            color: #e0e0e0;
-            overflow-x: hidden;
-            min-height: 600vh; /* Arbitrary large height to allow for scroll animations */
-            perspective: 1000px; /* For 3D effects if needed */
-        }
-
-        .fixed-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden; /* Crucial for containing fixed elements */
-            pointer-events: none; /* Allow clicks to pass through if no interactive elements */
-        }
-
-        .scene-content {
+        .popup-container {
             position: absolute;
+            background-color: #fff;
+            border: 3px solid red; /* Bright border for pop-ups */
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.5);
+            padding: 5px; /* Minimal padding for content */
+            z-index: 1000;
+            display: flex; /* To help center image if needed */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; /* Ensure image doesn't break out of rounded corners */
+        }
+
+        .popup-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover; /* Cover the area, might crop */
+            display: block;
+        }
+
+        .popup-header {
+            width: 100%;
+            background-color: #00008b; /* Dark blue, like old window titles */
+            color: white;
+            padding: 2px 5px;
+            font-size: 0.8em;
+            text-align: right;
+            cursor: grab; /* Indicate it can be "dragged" (though we won't implement dragging for simplicity here) */
+        }
+
+        .popup-header .close-btn {
+            background-color: red;
+            color: white;
+            border: 1px solid white;
+            padding: 0px 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        /* Just a small message on the main page */
+        .main-message {
+            position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            text-align: center;
-            width: 80%;
-            max-width: 700px;
-            opacity: 0;
-            transition: opacity 0.5s ease-out;
-            pointer-events: all; /* Enable pointer events for text sections */
+            font-size: 2em;
+            text-shadow: 2px 2px #ff0000;
+            z-index: 1;
         }
-
-        .scene-content.active {
-            opacity: 1;
-        }
-
-        h1 {
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            color: #fff;
-            text-shadow: 0 0 10px var(--connection-color), 0 0 20px var(--connection-color);
-            margin-bottom: 20px;
-        }
-
-        p {
-            font-size: clamp(1rem, 2.5vw, 1.2rem);
-            line-height: 1.7;
-            color: #ccc;
-        }
-
-        /* Characters & Thread */
-        .character {
-            position: absolute;
-            width: 30px; /* Start as orbs */
-            height: 30px;
-            border-radius: 50%;
-            box-shadow: 0 0 15px currentColor, 0 0 30px currentColor;
-            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), 
-                        width 0.8s ease, height 0.8s ease, border-radius 0.8s ease,
-                        opacity 0.5s ease;
-            will-change: transform, opacity; /* Performance hint */
-        }
-        
-        #girl {
-            color: var(--primary-color-girl);
-            background-color: var(--primary-color-girl);
-            top: 40vh;
-            left: 20vw;
-        }
-
-        #boy {
-            color: var(--primary-color-boy);
-            background-color: var(--primary-color-boy);
-            top: 60vh;
-            left: 80vw;
-        }
-
-        /* Stylized Humanoid Form (achieved by scaling and border-radius changes) */
-        .character.humanoid {
-            width: 20px; /* Slimmer */
-            height: 100px; /* Taller */
-            border-radius: 10px 10px 3px 3px; /* Top-heavy rounded rect for head/body */
-        }
-        .character.humanoid::before { /* Head */
-            content: '';
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            background-color: currentColor;
-            border-radius: 50%;
-            top: -15px; /* Position above the "body" */
-            left: 50%;
-            transform: translateX(-50%);
-            box-shadow: 0 0 10px currentColor;
-        }
-
-
-        #destiny-thread-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1; /* Behind characters if needed, or between them */
-        }
-
-        /* --- SCENE SPECIFIC STYLES & ANIMATIONS --- */
-
-        /* Universe / Cosmos Effect (Canvas will handle most of this) */
-        .stars-bg {
-            /* Managed by JS Canvas */
-        }
-
-        /* Crystal Cave Scene (Example of more complex CSS shapes) */
-        .crystal-container {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-            filter: blur(0px); /* Can be animated */
-        }
-        .crystal-container.active {
-            opacity: 0.7;
-        }
-
-        .crystal {
-            position: absolute;
-            width: 0;
-            height: 0;
-            border-left: 20px solid transparent;
-            border-right: 20px solid transparent;
-            opacity: 0.8;
-            transform-origin: 50% 100%; /* Base of crystal */
-        }
-
-        .crystal.c1 {
-            border-bottom: 120px solid var(--secondary-color-girl);
-            left: 15vw; top: 60vh;
-            transform: rotate(-15deg) scale(0);
-            animation: growCrystal 3s ease-out forwards;
-        }
-        .crystal.c2 {
-            border-bottom: 150px solid var(--secondary-color-boy);
-            right: 20vw; top: 50vh;
-            transform: rotate(20deg) scale(0);
-            animation: growCrystal 3s ease-out 0.5s forwards;
-        }
-        .crystal.c3 {
-            border-bottom: 100px solid var(--connection-color);
-            left: 45vw; top: 70vh;
-            transform: rotate(5deg) scale(0);
-            animation: growCrystal 3s ease-out 1s forwards;
-        }
-        @keyframes growCrystal {
-            to { transform: rotate(var(--final-rotate, 0deg)) scale(1); }
-        }
-
-        /* Forest of Light */
-        .light-beam-container {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-            overflow: hidden;
-        }
-        .light-beam-container.active {
-            opacity: 1;
-        }
-        .light-beam {
-            position: absolute;
-            bottom: 0;
-            width: clamp(10px, 2vw, 30px);
-            height: 0%; /* Animates to 100% or more */
-            background: linear-gradient(to top, currentColor, transparent);
-            opacity: 0.6;
-            transform-origin: bottom center;
-        }
-        /* JS will position and color these */
-
-
-        /* Cityscape Silhouette */
-        .cityscape-container {
-            position: absolute;
-            width: 100%;
-            height: 30vh; /* Covers bottom part */
-            bottom: 0;
-            left: 0;
-            opacity: 0;
-            transform: translateY(100%);
-            transition: opacity 1s ease, transform 1.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-        }
-        .cityscape-container.active {
-            opacity: 0.8;
-            transform: translateY(0);
-        }
-        .building {
-            position: absolute;
-            bottom: 0;
-            background-color: #181828; /* Dark silhouette */
-            box-shadow: 0 0 5px #000;
-        }
-        /* JS will generate buildings */
-
-        /* Final Merge / Aurora */
-        .aurora-canvas {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            opacity: 0;
-            transition: opacity 2s ease-in-out;
-        }
-        .aurora-canvas.active {
-            opacity: 0.8;
-        }
-
-
-        /* Debug Scroll Progress */
-        /* .debug-scroll {
-            position: fixed;
-            top: 10px; right: 10px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 5px;
-            font-size: 12px;
-            z-index: 10000;
-        } */
-
     </style>
 </head>
 <body>
-    <!-- Fixed container for all visual elements that react to scroll -->
-    <div class="fixed-container">
-        <canvas id="stars-bg-canvas"></canvas> <!-- For particles/stars -->
-        <canvas id="destiny-thread-canvas"></canvas>
 
-        <div id="girl" class="character"></div>
-        <div id="boy" class="character"></div>
-
-        <!-- Scene specific containers (toggled by JS) -->
-        <div class="crystal-container" id="crystal-scene-elements">
-            <!-- Crystals will be added by JS or can be hardcoded -->
-            <div class="crystal c1" style="--final-rotate: -15deg;"></div>
-            <div class="crystal c2" style="--final-rotate: 20deg;"></div>
-            <div class="crystal c3" style="--final-rotate: 5deg;"></div>
-        </div>
-
-        <div class="light-beam-container" id="forest-scene-elements">
-            <!-- Light beams will be added by JS -->
-        </div>
-
-        <div class="cityscape-container" id="city-scene-elements">
-            <!-- Buildings will be added by JS -->
-        </div>
-        
-        <canvas id="aurora-canvas" class="aurora-canvas"></canvas>
-    </div>
-
-    <!-- Content sections that appear at different scroll points -->
-    <!-- These are NOT in the fixed container. Their appearance is tied to scroll. -->
-    <div id="content-anchor-1" style="height: 150vh;"> <!-- Spacer / Scroll trigger point -->
-        <div class="scene-content" id="text-scene-1">
-            <h1>Worlds Apart</h1>
-            <p>In the vast cosmos of existence, two lights flickered. Unaware, unknown, yet bound by an unseen force, they navigated their solitary orbits.</p>
-        </div>
-    </div>
-
-    <div id="content-anchor-2" style="height: 150vh;"> <!-- Spacer / Scroll trigger point -->
-        <div class="scene-content" id="text-scene-2">
-            <h1>Echoes and Whispers</h1>
-            <p>A subtle pull, a resonance across the void. The universe hummed a quiet tune, guiding their paths through crystalline wonders and forests of ethereal light.</p>
-        </div>
-    </div>
-    
-    <div id="content-anchor-3" style="height: 150vh;"> <!-- Spacer / Scroll trigger point -->
-        <div class="scene-content" id="text-scene-3">
-            <h1>City of Dreams</h1>
-            <p>Through bustling silhouettes of shared experiences and silent observations, their journeys began to mirror, paths converging towards a shared horizon.</p>
-        </div>
-    </div>
-
-    <div id="content-anchor-4" style="height: 150vh;"> <!-- Spacer / Scroll trigger point -->
-        <div class="scene-content" id="text-scene-4">
-            <h1>Convergence</h1>
-            <p>And then, a moment. Not a collision, but a harmonious merge. The threads of destiny intertwine, painting the sky with the colors of two souls becoming one.</p>
-        </div>
-    </div>
-
-    <!-- <div class="debug-scroll">Scroll: 0%</div> -->
+    <div class="main-message">SYSTEM OVERLOAD...</div>
 
     <script>
-    const girl = document.getElementById('girl');
-    const boy = document.getElementById('boy');
-    const threadCanvas = document.getElementById('destiny-thread-canvas');
-    const threadCtx = threadCanvas.getContext('2d');
-    const starsCanvas = document.getElementById('stars-bg-canvas');
-    const starsCtx = starsCanvas.getContext('2d');
-    const auroraCanvas = document.getElementById('aurora-canvas');
-    const auroraCtx = auroraCanvas.getContext('2d');
+        // --- CONFIGURATION ---
+        const NUM_INITIAL_POPUPS = 15; // Number of pop-ups to generate on load
+        const MIN_POPUP_WIDTH = 150;   // Minimum width of a pop-up
+        const MAX_POPUP_WIDTH = 350;   // Maximum width of a pop-up
+        const MIN_POPUP_HEIGHT = 100;  // Minimum height of a pop-up
+        const MAX_POPUP_HEIGHT = 300;  // Maximum height of a pop-up
+        const POPUP_INTERVAL_MS = 700; // How often to spawn a new pop-up (in milliseconds)
+        const MAX_TOTAL_POPUPS = 50;   // Stop spawning after this many are on screen
 
-    // Scene element containers
-    const crystalContainer = document.getElementById('crystal-scene-elements');
-    const forestContainer = document.getElementById('forest-scene-elements');
-    const cityContainer = document.getElementById('city-scene-elements');
+        // --- !! IMPORTANT !! ---
+        // --- REPLACE THESE WITH YOUR IMAGE URLS ---
+        const IMAGE_PLACEHOLDERS = [
+            "https://via.placeholder.com/300x200/FF0000/FFFFFF?Text=Your_Image_1", // Red background
+            "https://via.placeholder.com/250x150/00FF00/000000?Text=Your_Image_2", // Green background
+            "https://via.placeholder.com/350x250/0000FF/FFFFFF?Text=Your_Image_3", // Blue background
+            "https://via.placeholder.com/200x300/FFFF00/000000?Text=Your_Image_4", // Yellow background
+            "https://via.placeholder.com/300x180/FF00FF/FFFFFF?Text=Your_Image_5"  // Magenta background
+            // Add as many image URLs as you want here. They will be picked randomly.
+        ];
+        // For example, if you have images in the same folder as the HTML file:
+        // const IMAGE_PLACEHOLDERS = [
+        //     "boob_image_1.jpg",
+        //     "another_pic.png",
+        //     "image3.gif"
+        // ];
+        // --- END IMAGE PLACEHOLDERS ---
 
-    // Text content sections
-    const textScenes = [
-        document.getElementById('text-scene-1'),
-        document.getElementById('text-scene-2'),
-        document.getElementById('text-scene-3'),
-        document.getElementById('text-scene-4')
-    ];
 
-    // const debugScroll = document.querySelector('.debug-scroll'); // For debugging
+        let popupCount = 0;
 
-    let W, H; // Window dimensions
-    function resizeCanvases() {
-        W = window.innerWidth;
-        H = window.innerHeight;
-        [threadCanvas, starsCanvas, auroraCanvas].forEach(canvas => {
-            canvas.width = W;
-            canvas.height = H;
-        });
-    }
-    window.addEventListener('resize', () => {
-        resizeCanvases();
-        // Re-init effects that depend on W/H if necessary
-        initStars(); 
-        initCityscape();
-        initForestBeams();
-    });
-    resizeCanvases();
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
 
-    // --- Starfield Background ---
-    let stars = [];
-    function initStars() {
-        stars = [];
-        const numStars = W < 768 ? 100 : 200;
-        for (let i = 0; i < numStars; i++) {
-            stars.push({
-                x: Math.random() * W,
-                y: Math.random() * H,
-                z: Math.random() * W, // depth for parallax
-                size: Math.random() * 1.5 + 0.5,
-                opacity: Math.random() * 0.5 + 0.3
+        function getRandomImageURL() {
+            if (IMAGE_PLACEHOLDERS.length === 0) {
+                return "https://via.placeholder.com/200x150/CCCCCC/000000?Text=No_Image_Set"; // Default if no images provided
+            }
+            const randomIndex = Math.floor(Math.random() * IMAGE_PLACEHOLDERS.length);
+            return IMAGE_PLACEHOLDERS[randomIndex];
+        }
+
+        function createPopup() {
+            if (document.querySelectorAll('.popup-container').length >= MAX_TOTAL_POPUPS) {
+                return; // Don't create more if limit is reached
+            }
+
+            const popup = document.createElement('div');
+            popup.className = 'popup-container';
+            popupCount++;
+
+            const width = getRandomInt(MIN_POPUP_WIDTH, MAX_POPUP_WIDTH);
+            const height = getRandomInt(MIN_POPUP_HEIGHT, MAX_POPUP_HEIGHT);
+
+            popup.style.width = `${width}px`;
+            popup.style.height = `${height}px`;
+
+            // Ensure popups are somewhat within the viewport initially, but can overlap
+            const maxX = window.innerWidth - width - 10; // -10 for margin
+            const maxY = window.innerHeight - height - 10;
+            popup.style.left = `${getRandomInt(0, Math.max(0, maxX))}px`;
+            popup.style.top = `${getRandomInt(0, Math.max(0, maxY))}px`;
+            popup.style.zIndex = 1000 + popupCount; // Ensure newer popups are on top
+
+            // Create a header for the "window"
+            const header = document.createElement('div');
+            header.className = 'popup-header';
+            
+            const titleText = document.createTextNode(`Window ${popupCount} `);
+            
+            const closeButton = document.createElement('span');
+            closeButton.className = 'close-btn';
+            closeButton.innerHTML = 'X';
+            closeButton.onclick = function(event) {
+                event.stopPropagation(); // Prevent click from bubbling to other elements
+                popup.remove();
+            };
+
+            header.appendChild(titleText);
+            header.appendChild(closeButton);
+            popup.appendChild(header);
+
+            // Add the image
+            const img = document.createElement('img');
+            img.src = getRandomImageURL();
+            img.alt = 'Popup Content';
+            // Adjust image style to fill the content area below the header
+            img.style.width = '100%';
+            img.style.height = `calc(100% - ${header.offsetHeight}px - 10px)`; // 10px for padding_bottom of container
+            img.style.objectFit = 'cover';
+
+            popup.appendChild(img);
+            document.body.appendChild(popup);
+        }
+
+        // Create initial batch of pop-ups
+        for (let i = 0; i < NUM_INITIAL_POPUPS; i++) {
+            setTimeout(createPopup, i * 100); // Stagger initial popups slightly
+        }
+
+        // Continuously create new pop-ups at an interval
+        if (POPUP_INTERVAL_MS > 0) {
+            setInterval(createPopup, POPUP_INTERVAL_MS);
+        }
+
+        // Optional: Create a new popup on click anywhere on the body
+        // document.body.addEventListener('click', createPopup);
+
+        // Adjust pop-up positions on window resize (basic)
+        window.addEventListener('resize', () => {
+            const popups = document.querySelectorAll('.popup-container');
+            popups.forEach(popup => {
+                const width = popup.offsetWidth;
+                const height = popup.offsetHeight;
+                let currentLeft = parseInt(popup.style.left, 10);
+                let currentTop = parseInt(popup.style.top, 10);
+
+                if (currentLeft + width > window.innerWidth) {
+                    popup.style.left = `${Math.max(0, window.innerWidth - width - 10)}px`;
+                }
+                if (currentTop + height > window.innerHeight) {
+                    popup.style.top = `${Math.max(0, window.innerHeight - height - 10)}px`;
+                }
             });
-        }
-    }
-    function drawStars(scrollProgress) {
-        starsCtx.clearRect(0, 0, W, H);
-        starsCtx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-        stars.forEach(star => {
-            starsCtx.globalAlpha = star.opacity;
-            // Parallax effect: deeper stars move slower
-            const parallaxFactor = star.z / W; // Normalize z
-            const currentX = (star.x - scrollProgress * parallaxFactor * 100) % W; // Horizontal drift
-            const currentY = (star.y + scrollProgress * parallaxFactor * 50) % H; // Slight vertical drift
-            
-            starsCtx.beginPath();
-            starsCtx.arc(currentX < 0 ? currentX + W : currentX, 
-                         currentY < 0 ? currentY + H : currentY, 
-                         star.size, 0, Math.PI * 2);
-            starsCtx.fill();
-        });
-        starsCtx.globalAlpha = 1;
-    }
-    initStars();
-
-
-    // --- Destiny Thread ---
-    function drawThread(p1, p2, progress) {
-        threadCtx.clearRect(0, 0, W, H);
-        threadCtx.beginPath();
-        threadCtx.moveTo(p1.x, p1.y);
-
-        const cp1x = p1.x + (p2.x - p1.x) * 0.25 + Math.sin(progress * Math.PI * 2) * 50 * (1 - progress);
-        const cp1y = p1.y + (p2.y - p1.y) * 0.25 - Math.cos(progress * Math.PI * 1.5) * 70 * (1 - progress);
-        const cp2x = p1.x + (p2.x - p1.x) * 0.75 - Math.sin(progress * Math.PI * 2.5) * 60 * (1 - progress);
-        const cp2y = p1.y + (p2.y - p1.y) * 0.75 + Math.cos(progress * Math.PI * 1.8) * 80 * (1 - progress);
-        
-        threadCtx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
-
-        const gradient = threadCtx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
-        gradient.addColorStop(0, getComputedStyle(document.documentElement).getPropertyValue('--primary-color-girl'));
-        gradient.addColorStop(0.5, getComputedStyle(document.documentElement).getPropertyValue('--connection-color'));
-        gradient.addColorStop(1, getComputedStyle(document.documentElement).getPropertyValue('--primary-color-boy'));
-        
-        threadCtx.strokeStyle = gradient;
-        threadCtx.lineWidth = Math.max(1, 3 - progress * 2); // Thread thins slightly as they get closer
-        threadCtx.shadowColor = getComputedStyle(document.documentElement).getPropertyValue('--connection-color');
-        threadCtx.shadowBlur = 10 + progress * 10;
-        threadCtx.stroke();
-        threadCtx.shadowBlur = 0; // Reset shadow for other drawings
-    }
-
-    // --- Character Movement and Appearance ---
-    function updateCharacters(scrollProgress) {
-        const girlRect = girl.getBoundingClientRect();
-        const boyRect = boy.getBoundingClientRect();
-
-        // Initial positions (these are relative to viewport, not absolute document)
-        const girlStartX = 0.2 * W; const girlStartY = 0.4 * H;
-        const boyStartX = 0.8 * W;  const boyStartY = 0.6 * H;
-
-        // Target positions for meeting (center-ish)
-        const meetX = W / 2; const meetY = H / 2;
-
-        // Interpolate positions
-        // Girl moves from left to center, Boy from right to center
-        // They start moving more significantly after a certain scroll progress
-        const moveStartProgress = 0.1; // When characters start moving noticeably
-        const moveEndProgress = 0.85; // When they fully meet
-        
-        let currentProgress = 0;
-        if (scrollProgress > moveStartProgress) {
-            currentProgress = Math.min(1, (scrollProgress - moveStartProgress) / (moveEndProgress - moveStartProgress));
-        }
-
-        const girlCurrentX = girlStartX + (meetX - girlStartX - girlRect.width/2) * currentProgress;
-        const girlCurrentY = girlStartY + (meetY - girlStartY - girlRect.height/2) * currentProgress;
-        const boyCurrentX = boyStartX + (meetX - boyStartX + boyRect.width/2) * currentProgress; // Note: + boyRect for right alignment to center
-        const boyCurrentY = boyStartY + (meetY - boyStartY - boyRect.height/2) * currentProgress;
-
-        girl.style.transform = `translate(${girlCurrentX - girlStartX}px, ${girlCurrentY - girlStartY}px) rotate(${scrollProgress * 360}deg)`;
-        boy.style.transform = `translate(${boyCurrentX - boyStartX}px, ${boyCurrentY - boyStartY}px) rotate(${-scrollProgress * 360}deg)`;
-
-        // Morph into humanoid shapes
-        const morphStartProgress = 0.3;
-        const morphEndProgress = 0.6;
-        if (scrollProgress > morphStartProgress) {
-            const morphProgress = Math.min(1, (scrollProgress - morphStartProgress) / (morphEndProgress - morphStartProgress));
-            if (morphProgress > 0.1) { // Add class a bit after start
-                girl.classList.add('humanoid');
-                boy.classList.add('humanoid');
-            }
-        } else {
-            girl.classList.remove('humanoid');
-            boy.classList.remove('humanoid');
-        }
-
-        // Final merge visual
-        if (scrollProgress > 0.85) {
-            const mergeProgress = Math.min(1, (scrollProgress - 0.85) / 0.15);
-            girl.style.opacity = 1 - mergeProgress;
-            boy.style.opacity = 1 - mergeProgress;
-            // Could add a combined "merged" element here.
-        } else {
-            girl.style.opacity = 1;
-            boy.style.opacity = 1;
-        }
-
-        // Return center points for the thread
-        // Adjust for the fact that transform is relative to initial CSS pos
-        return {
-            girlPos: { x: girlCurrentX + girlRect.width / 2, y: girlCurrentY + girlRect.height / 2 },
-            boyPos: { x: boyCurrentX + boyRect.width / 2, y: boyCurrentY + boyRect.height / 2 }
-        };
-    }
-
-
-    // --- Scene Management & Transitions ---
-    function manageScenes(scrollProgress) {
-        // Toggle Text Visibility
-        const totalTextScenes = textScenes.length;
-        const progressPerTextScene = 1 / totalTextScenes;
-        textScenes.forEach((ts, index) => {
-            const sceneStart = index * progressPerTextScene;
-            const sceneEnd = (index + 1) * progressPerTextScene;
-            // Activate text slightly into its segment, fade out before next
-            if (scrollProgress > sceneStart + 0.05 && scrollProgress < sceneEnd - 0.05) {
-                ts.classList.add('active');
-            } else {
-                ts.classList.remove('active');
-            }
         });
 
-        // Toggle Visual Scene Elements
-        // Scene 1: Cosmos (always active via stars canvas)
-
-        // Scene 2: Crystal Cave (approx 0.25 - 0.5 scroll)
-        if (scrollProgress > 0.2 && scrollProgress < 0.55) {
-            crystalContainer.classList.add('active');
-        } else {
-            crystalContainer.classList.remove('active');
-        }
-        
-        // Scene 3: Forest of Light (approx 0.45 - 0.7)
-        if (scrollProgress > 0.4 && scrollProgress < 0.75) {
-            forestContainer.classList.add('active');
-            if (forestContainer.children.length === 0) initForestBeams(); // Init if not already
-            updateForestBeams(scrollProgress);
-        } else {
-            forestContainer.classList.remove('active');
-        }
-
-        // Scene 4: Cityscape (approx 0.6 - 0.85)
-        if (scrollProgress > 0.55 && scrollProgress < 0.9) {
-            cityContainer.classList.add('active');
-            if (cityContainer.children.length === 0) initCityscape();
-        } else {
-            cityContainer.classList.remove('active');
-        }
-        
-        // Scene 5: Aurora/Merge (approx 0.8 onwards)
-        if (scrollProgress > 0.8) {
-            auroraCanvas.classList.add('active');
-            drawAurora(auroraCtx, W, H, scrollProgress);
-        } else {
-            auroraCanvas.classList.remove('active');
-        }
-    }
-    
-    // --- Forest of Light Specifics ---
-    let lightBeams = [];
-    function initForestBeams() {
-        forestContainer.innerHTML = ''; // Clear previous
-        lightBeams = [];
-        const numBeams = W < 768 ? 10 : 20;
-        for (let i = 0; i < numBeams; i++) {
-            const beam = document.createElement('div');
-            beam.classList.add('light-beam');
-            const xPos = Math.random() * 90 + 5; // 5% to 95% of width
-            beam.style.left = `${xPos}vw`;
-            beam.style.color = Math.random() > 0.5 ? 
-                (Math.random() > 0.5 ? 'var(--primary-color-girl)' : 'var(--secondary-color-girl)') :
-                (Math.random() > 0.5 ? 'var(--primary-color-boy)' : 'var(--secondary-color-boy)');
-            beam.style.setProperty('--initial-height', (Math.random() * 60 + 40) + '%'); // Store initial target height
-            beam.style.setProperty('--delay', (Math.random() * 1) + 's');
-            forestContainer.appendChild(beam);
-            lightBeams.push(beam);
-        }
-    }
-    function updateForestBeams(scrollProgress) {
-        // Animate height based on scroll progress within its active range
-        const forestActiveStart = 0.4;
-        const forestActiveEnd = 0.75;
-        let forestProgress = 0;
-        if (scrollProgress > forestActiveStart) {
-            forestProgress = Math.min(1, (scrollProgress - forestActiveStart) / (forestActiveEnd - forestActiveStart));
-        }
-
-        lightBeams.forEach(beam => {
-            const initialHeight = parseFloat(beam.style.getPropertyValue('--initial-height'));
-            const delay = parseFloat(beam.style.getPropertyValue('--delay')); // Could use for staggered animation
-            beam.style.height = `${initialHeight * forestProgress}%`;
-            // Add a subtle sway
-            beam.style.transform = `skewX(${Math.sin(Date.now()/1000 + parseFloat(beam.style.left)) * forestProgress * 2}deg)`;
-        });
-    }
-
-
-    // --- Cityscape Specifics ---
-    function initCityscape() {
-        cityContainer.innerHTML = ''; // Clear previous
-        const numBuildings = Math.floor(W / (W < 768 ? 40 : 60) ); // Responsive number
-        let currentX = 0;
-        for (let i = 0; i < numBuildings; i++) {
-            const building = document.createElement('div');
-            building.classList.add('building');
-            const width = Math.random() * (W < 768 ? 30 : 50) + (W < 768 ? 20 : 30);
-            const height = Math.random() * (0.25*H) + (0.05*H); // 5% to 30% of viewport height
-            
-            building.style.width = `${width}px`;
-            building.style.height = `${height}px`;
-            building.style.left = `${currentX}px`;
-            
-            // Add slight variation in top (for skyline effect)
-            const topVariation = Math.random() * 20 - 10; // -10px to 10px
-            building.style.bottom = `${topVariation}px`;
-
-            cityContainer.appendChild(building);
-            currentX += width * (Math.random() * 0.3 + 0.7); // Add some spacing
-            if (currentX > W) break;
-        }
-    }
-
-    // --- Aurora Effect (Simple Placeholder) ---
-    let auroraParticles = [];
-    function drawAurora(ctx, w, h, scrollProgress) {
-        if (!auroraCanvas.classList.contains('active')) return;
-
-        const auroraStrength = Math.min(1, (scrollProgress - 0.8) / 0.2);
-        if (auroraStrength < 0.05) { // Don't draw if too faint
-             ctx.clearRect(0, 0, w, h);
-             auroraParticles = []; // Reset particles
-             return;
-        }
-
-        ctx.globalCompositeOperation = 'lighter'; // Additive blending for glow
-
-        // Add new particles based on strength
-        if (Math.random() < auroraStrength * 0.5 && auroraParticles.length < 200) {
-            auroraParticles.push({
-                x: Math.random() * w,
-                y: Math.random() * h * 0.6, // Upper 60% of screen
-                vx: (Math.random() - 0.5) * 2,
-                vy: (Math.random() - 0.5) * 0.5 - 0.5, // Tend to move up
-                life: Math.random() * 50 + 50,
-                color: Math.random() > 0.5 ? 
-                    `rgba(255, 128, 192, ${Math.random()*0.3 + 0.1})` : // Pinkish
-                    `rgba(128, 191, 255, ${Math.random()*0.3 + 0.1})`, // Bluish
-                size: Math.random() * 40 + 20
-            });
-        }
-        
-        ctx.clearRect(0, 0, w, h); // Clear with slight trail if not using lighter
-
-        for (let i = auroraParticles.length - 1; i >= 0; i--) {
-            let p = auroraParticles[i];
-            p.x += p.vx;
-            p.y += p.vy;
-            p.life -= 1;
-
-            if (p.life <= 0 || p.x < -p.size || p.x > w + p.size || p.y < -p.size || p.y > h + p.size) {
-                auroraParticles.splice(i, 1);
-                continue;
-            }
-            
-            const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * (p.life / 100));
-            g.addColorStop(0, p.color.replace(/[\d\.]+\)$/g, `${(p.life/100)*0.8})`)); // Fade out center
-            g.addColorStop(1, p.color.replace(/[\d\.]+\)$/g, '0)')); // Transparent edge
-            
-            ctx.fillStyle = g;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size * (p.life / 100), 0, Math.PI * 2);
-            ctx.fill();
-        }
-        ctx.globalCompositeOperation = 'source-over'; // Reset
-    }
-
-    // --- Main Animation Loop ---
-    function animate() {
-        const scrollTotal = document.body.scrollHeight - window.innerHeight;
-        const currentScroll = window.scrollY;
-        const scrollProgress = Math.min(1, currentScroll / scrollTotal);
-        
-        document.documentElement.style.setProperty('--scroll-progress', scrollProgress);
-        // if (debugScroll) debugScroll.textContent = `Scroll: ${(scrollProgress * 100).toFixed(1)}%`;
-
-        drawStars(scrollProgress); // Update star parallax
-        const charPositions = updateCharacters(scrollProgress);
-        drawThread(charPositions.girlPos, charPositions.boyPos, scrollProgress);
-        
-        manageScenes(scrollProgress);
-        
-        // Aurora is also handled within manageScenes if active
-        // drawAurora(auroraCtx, W, H, scrollProgress); 
-
-        requestAnimationFrame(animate);
-    }
-
-    // Initial setup calls
-    initCityscape();
-    initForestBeams();
-    // Start animation loop
-    animate();
-
-    console.log("The Thread of Destiny awaits. Scroll to unfold the story.");
     </script>
 </body>
 </html>
