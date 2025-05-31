@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cosmic Echoes of Love</title>
+    <title>Dot & Dash: A Colorful Quest!</title>
     <style>
         /* CSS Reset & Base Styles */
         *, *::before, *::after {
@@ -12,452 +12,591 @@
             padding: 0;
         }
 
-        html, body {
-            height: 100%;
-            overflow-x: hidden; /* Prevent horizontal scrollbars */
-            font-family: 'Georgia', serif; /* A more classic, romantic font */
-            background-color: #0a0a1a; /* Deep space blue */
-            color: #e0e0ff; /* Soft lavender text */
+        html {
             scroll-behavior: smooth;
         }
 
-        body::-webkit-scrollbar {
-            width: 8px;
-        }
-        body::-webkit-scrollbar-track {
-            background: #0a0a1a;
-        }
-        body::-webkit-scrollbar-thumb {
-            background-color: #4a4a8a;
-            border-radius: 20px;
-            border: 2px solid #0a0a1a;
-        }
-
-        canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: -1; /* Behind content */
-            width: 100%;
-            height: 100%;
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Marker Felt', sans-serif; /* Fun, playful font */
+            overflow-x: hidden;
+            background-color: #f0f8ff; /* Alice Blue - very light! */
+            color: #333;
+            line-height: 1.6;
         }
 
         .scene {
-            min-height: 100vh; /* Each scene takes at least full viewport height */
+            min-height: 100vh;
+            padding: 50px 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 40px 20px;
             text-align: center;
-            position: relative; /* For z-indexing if needed */
+            position: relative;
+            border-bottom: 5px dashed #ffcc00; /* Sunny yellow dashes */
             opacity: 0;
-            transform: translateY(50px);
-            transition: opacity 1.5s ease-out, transform 1.5s ease-out;
+            transform: scale(0.9);
+            transition: opacity 1s ease-out, transform 1s ease-out;
         }
 
         .scene.visible {
             opacity: 1;
-            transform: translateY(0);
+            transform: scale(1);
+        }
+        
+        .scene:last-child {
+            border-bottom: none;
         }
 
-        h1, h2, p {
-            max-width: 800px;
+        h1, h2 {
             margin-bottom: 20px;
-            text-shadow: 0 0 10px rgba(200, 200, 255, 0.5);
+            color: #ff6347; /* Tomato red */
         }
 
         h1 {
             font-size: 3.5rem;
-            font-weight: normal;
-            color: #f0f0ff;
-            letter-spacing: 2px;
+            text-shadow: 2px 2px #fff, 4px 4px #ffdab9; /* Peach puff shadow */
         }
 
         h2 {
-            font-size: 2rem;
-            font-weight: normal;
-            color: #d0d0f0;
-            margin-top: 40px;
+            font-size: 2.5rem;
+            color: #4682b4; /* Steel blue */
         }
 
         p {
             font-size: 1.2rem;
-            line-height: 1.8;
-            color: #c0c0e0;
+            max-width: 600px;
+            margin-bottom: 30px;
         }
 
         .highlight {
-            color: #ffae70; /* Warm contrast */
-            font-style: italic;
+            color: #32cd32; /* Lime green */
+            font-weight: bold;
+            background-color: rgba(255, 255, 0, 0.3); /* Light yellow highlight */
+            padding: 2px 5px;
+            border-radius: 5px;
         }
 
-        /* Specific Scene Styling */
-        #scene-intro h1 {
-            animation: pulse-glow 3s infinite alternate;
+        /* Character Styles */
+        .character {
+            position: fixed; /* They will move with scroll */
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            transition: all 0.5s ease-out;
+            z-index: 10;
         }
 
-        @keyframes pulse-glow {
-            from { text-shadow: 0 0 10px rgba(220, 220, 255, 0.7), 0 0 20px rgba(200, 200, 255, 0.5); }
-            to { text-shadow: 0 0 20px rgba(255, 255, 255, 1), 0 0 30px rgba(220, 220, 255, 0.7); }
+        #dot {
+            background-color: #ff69b4; /* Hot pink */
+            border: 4px solid #ff1493; /* Deep pink */
+            left: 10%;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 0 15px #ff69b4;
+        }
+        #dot::before { /* Eye */
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50% / 40%;
+            top: 15px;
+            left: 30px;
+            border: 2px solid black;
+        }
+        #dot::after { /* Pupil */
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 10px;
+            background-color: black;
+            border-radius: 50%;
+            top: 20px; /* Adjusted for pupil pos */
+            left: 33px; /* Adjusted for pupil pos */
+            animation: blink 3s infinite ease-in-out 0.5s;
         }
 
-        #scene-her .particle-source, #scene-him .particle-source {
-            width: 100px;
-            height: 100px;
+
+        #dash {
+            background-color: #1e90ff; /* Dodger blue */
+            width: 50px;
+            height: 70px;
+            border-radius: 30px 30px 10px 10px; /* Dash-like shape */
+            border: 4px solid #0000cd; /* Medium blue */
+            right: 10%;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 0 15px #1e90ff;
+        }
+        #dash::before { /* Eye */
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50% / 40%;
+            top: 15px;
+            right: 25px; /* Positioned from right */
+            border: 2px solid black;
+        }
+        #dash::after { /* Pupil */
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 10px;
+            background-color: black;
+            border-radius: 50%;
+            top: 20px; /* Adjusted for pupil pos */
+            right: 28px; /* Adjusted for pupil pos */
+            animation: blink 3s infinite ease-in-out;
+        }
+        
+        @keyframes blink {
+            0%, 90%, 100% { transform: scaleY(1); }
+            95% { transform: scaleY(0.1); }
+        }
+
+        /* Scene Specific Styles */
+        #scene-intro { background-color: #lightgoldenrodyellow; }
+        #scene-intro h1 { animation: bounceText 1.5s infinite alternate; }
+        
+        @keyframes bounceText {
+            from { transform: translateY(0px); }
+            to { transform: translateY(-10px); }
+        }
+
+        #scene-hills { background-color: #90ee90; /* Light green */ }
+        .hill {
+            position: absolute;
+            border-radius: 50% 50% 0 0;
+            background-color: #3cb371; /* Medium sea green */
+        }
+        .hill1 { width: 300px; height: 150px; bottom: 0; left: 10%; opacity: 0.8; }
+        .hill2 { width: 400px; height: 200px; bottom: 0; right: 5%; }
+        .hill3 { width: 250px; height: 120px; bottom: 0; left: 40%; opacity: 0.6;}
+
+        #scene-sky { background: linear-gradient(to bottom, #87ceeb, #add8e6); /* Sky blue gradient */ }
+        .cloud {
+            position: absolute;
+            background-color: white;
+            border-radius: 50px;
+            opacity: 0.8;
+            animation: floatCloud 20s infinite linear alternate;
+        }
+        .cloud::before, .cloud::after {
+            content: '';
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            box-shadow: 10px 10px 5px rgba(0,0,0,0.1) inset; /* Subtle shadow for depth */
+        }
+        .cloud1 { width: 120px; height: 70px; top: 20%; left: 15%; }
+        .cloud1::before { width: 70px; height: 70px; top: -30px; left: 20px; }
+        .cloud1::after { width: 80px; height: 80px; top: -20px; right: 10px; }
+
+        .cloud2 { width: 180px; height: 100px; top: 40%; right: 10%; animation-duration: 25s;}
+        .cloud2::before { width: 100px; height: 100px; top: -50px; left: 30px; }
+        .cloud2::after { width: 90px; height: 90px; top: -40px; right: 20px; }
+
+        @keyframes floatCloud {
+            from { transform: translateX(-20px); }
+            to { transform: translateX(20px); }
+        }
+        
+        .flying-heart {
+            position: absolute;
+            font-size: 2rem;
+            color: #ff4500; /* OrangeRed */
+            animation: flyAcross 5s linear infinite;
+            opacity: 0;
+        }
+        @keyframes flyAcross {
+            0% { transform: translate(0,0) rotate(0deg); opacity: 1;}
+            50% { transform: translate(50px, -30px) rotate(15deg); }
+            100% { transform: translate(100px, 0) rotate(0deg); opacity: 0;}
+        }
+
+        #scene-forest { background-color: #deb887; /* BurlyWood */ }
+        .tree {
+            position: absolute;
+            bottom: 0;
+        }
+        .tree .trunk {
+            width: 40px;
+            height: 150px;
+            background-color: #8b4513; /* SaddleBrown */
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .tree .leaves {
+            width: 120px;
+            height: 120px;
+            background-color: #228b22; /* ForestGreen */
             border-radius: 50%;
             position: absolute;
-            opacity: 0.7;
-            animation: gentle-throb 4s infinite alternate ease-in-out;
+            bottom: 130px; /* Above trunk */
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        
-        #particle-source-her {
-            background: radial-gradient(circle, #ff80b0, #e06090 30%, transparent 70%);
-            left: 20%;
-            top: 40%;
+        .tree1 { left: 15%; transform: scale(0.8); }
+        .tree2 { left: 75%; transform: scale(1.1); }
+        .tree3 { left: 45%; transform: scale(0.9); bottom: -20px; } /* Slightly offset */
+
+        #scene-bridge { background: linear-gradient(to bottom, #ffe4b5, #ffdead); /* Moccasin to NavajoWhite */ }
+        .river {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 25vh;
+            background: linear-gradient(to right, #4169e1, #87cefa); /* RoyalBlue to LightSkyBlue */
+            overflow: hidden;
         }
-        #particle-source-him {
-            background: radial-gradient(circle, #80b0ff, #6090e0 30%, transparent 70%);
-            right: 20%;
-            top: 60%;
+        .wave {
+            position: absolute;
+            width: 200%;
+            height: 50px;
+            background-image: 
+                radial-gradient(circle at 25px 25px, transparent 20px, #add8e6 21px), /* LightBlue */
+                radial-gradient(circle at 75px 25px, transparent 20px, #add8e6 21px);
+            background-size: 100px 50px;
+            animation: waveAnim 4s linear infinite;
+            opacity: 0.5;
+        }
+        .wave.wave1 { top: 10%; }
+        .wave.wave2 { top: 30%; animation-delay: -2s; opacity: 0.7; }
+        @keyframes waveAnim {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100px); } /* Half of one wave unit */
+        }
+        .rainbow-bridge {
+            width: 60%;
+            height: 300px; /* Taller arc */
+            border-radius: 150px 150px 0 0; /* Semicircle */
+            position: absolute;
+            left: 50%;
+            bottom: 20vh; /* Above river */
+            transform: translateX(-50%);
+            background: linear-gradient(to bottom, 
+                red 14.28%, 
+                orange 28.56%, 
+                yellow 42.84%, 
+                green 57.12%, 
+                blue 71.4%, 
+                indigo 85.68%, 
+                violet 100%
+            );
+            box-shadow: 0px -10px 20px rgba(0,0,0,0.2);
         }
 
-        @keyframes gentle-throb {
-            0% { transform: scale(0.9); box-shadow: 0 0 20px rgba(255,255,255,0.2); }
-            100% { transform: scale(1.1); box-shadow: 0 0 40px rgba(255,255,255,0.4); }
+        #scene-party {
+            background: radial-gradient(circle, #fffacd, #ffd700, #ffb347); /* LemonChiffon, Gold, Pastel Orange */
+        }
+        .confetti-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 20px;
+            opacity: 0;
+            animation: fall 3s linear infinite;
+        }
+        .confetti.c1 { background-color: #ff6347; /* Tomato */ }
+        .confetti.c2 { background-color: #32cd32; /* LimeGreen */ }
+        .confetti.c3 { background-color: #1e90ff; /* DodgerBlue */ }
+        .confetti.c4 { background-color: #ff69b4; /* HotPink */ }
+        .confetti.c5 { background-color: #ffd700; /* Gold */ }
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
         }
 
-        #scene-connection .connection-visual {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            background: radial-gradient(circle, #ffffff, #f0e0ff 40%, #d0b0ff 70%, transparent 90%);
-            box-shadow: 0 0 30px #fff, 0 0 60px #f0e0ff, 0 0 90px #d0b0ff;
-            animation: radiant-burst 5s infinite alternate ease-in-out;
-            margin-bottom: 30px;
-        }
-
-        @keyframes radiant-burst {
-            0% { transform: scale(0.8); opacity: 0.7; box-shadow: 0 0 20px #fff, 0 0 40px #f0e0ff, 0 0 60px #d0b0ff;}
-            100% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 40px #fff, 0 0 80px #f0e0ff, 0 0 120px #d0b0ff;}
-        }
-        
-        #scene-universe .universe-text {
-            transition-delay: 0.5s; /* Delay for text after scene appears */
-        }
-
-        #scene-legacy .legacy-symbol {
+        .final-hug {
             font-size: 5rem;
-            color: #ffd700; /* Gold */
-            text-shadow: 0 0 15px #ffd700, 0 0 30px #ffae70;
-            animation: slow-spin 20s linear infinite;
-            margin-bottom: 30px;
+            animation: heartBeat 1s infinite alternate;
+        }
+        @keyframes heartBeat {
+            from { transform: scale(1); color: #ff4500; }
+            to { transform: scale(1.2); color: #dc143c; } /* Crimson */
         }
 
-        @keyframes slow-spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .scroll-down-indicator {
+        .scroll-prompt {
             position: absolute;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             font-size: 1rem;
-            color: #aaa;
-            animation: bounce 2s infinite;
+            color: #555;
+            animation: bouncePrompt 1.5s infinite;
         }
-        .scroll-down-indicator::after {
-            content: '▽';
+        .scroll-prompt::after {
+            content: '👇';
             display: block;
             font-size: 1.5rem;
         }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
-            40% { transform: translateX(-50%) translateY(-10px); }
-            60% { transform: translateX(-50%) translateY(-5px); }
+        @keyframes bouncePrompt {
+          0%, 20%, 50%, 80%, 100% {transform: translate(-50%, 0);}
+          40% {transform: translate(-50%, -10px);}
+          60% {transform: translate(-50%, -5px);}
         }
 
-        /* For smaller screens */
+        /* Responsive adjustments */
         @media (max-width: 768px) {
             h1 { font-size: 2.5rem; }
-            h2 { font-size: 1.8rem; }
+            h2 { font-size: 2rem; }
             p { font-size: 1rem; }
-            #particle-source-her, #particle-source-him {
-                width: 60px;
-                height: 60px;
-            }
-            #particle-source-her { left: 10%; top: 30%; }
-            #particle-source-him { right: 10%; top: 70%; }
-
-            #scene-connection .connection-visual {
-                width: 150px;
-                height: 150px;
-            }
+            .character { width: 40px; height: 40px; }
+            #dot::before { width:10px; height: 14px; top:10px; left: 20px;}
+            #dot::after { width:5px; height:7px; top:13px; left:22px;}
+            #dash {width:35px; height:50px;}
+            #dash::before { width:10px; height: 14px; top:10px; right: 15px;}
+            #dash::after { width:5px; height:7px; top:13px; right:17px;}
+            .hill1 { width: 200px; height: 100px; }
+            .hill2 { width: 280px; height: 140px; }
+            .rainbow-bridge { height: 200px; border-radius: 100px 100px 0 0; }
         }
 
     </style>
 </head>
 <body>
-    <canvas id="starCanvas"></canvas>
+
+    <div id="dot" class="character"></div>
+    <div id="dash" class="character"></div>
 
     <section id="scene-intro" class="scene">
-        <h1>Whispers in the Cosmic Dust</h1>
-        <p>In the vast, silent theater of the cosmos, where stars are born and die in breathtaking silence, two nascent lights began to stir. Unaware of each other, yet part of the same grand design.</p>
-        <div class="scroll-down-indicator">Scroll</div>
+        <h1>Dot & Dash's Great Adventure!</h1>
+        <p>Once upon a time, in a land of wiggles and giggles, lived <span class="highlight">Dot</span> and <span class="highlight">Dash</span>. They were the best of pals, but lived on opposite sides of everything!</p>
+        <p>Let's help them meet! Scroll down to start their journey!</p>
+        <div class="scroll-prompt">Scroll!</div>
     </section>
 
-    <section id="scene-her" class="scene">
-        <div id="particle-source-her" class="particle-source"></div>
-        <h2>Her Solitude, A Gentle Glow</h2>
-        <p>One was a soft luminescence, a <span class="highlight">rose-tinted nebula</span> dreaming in hues of dawn. She danced in gentle orbits, her light a quiet song of hope, a promise of warmth yet to be shared. Her essence, a delicate bloom in the infinite garden of space.</p>
-        <div class="scroll-down-indicator">Scroll</div>
+    <section id="scene-hills" class="scene">
+        <div class="hill hill1"></div>
+        <div class="hill hill2"></div>
+        <div class="hill hill3"></div>
+        <h2>Over the Wobbly Hills!</h2>
+        <p>First, they had to cross the <span class="highlight">Ticklish Hills</span>. Dot bounced and Dash zoomed! "Whee!" giggled Dot. "Coming!" shouted Dash.</p>
+        <div class="scroll-prompt">Keep Going!</div>
     </section>
 
-    <section id="scene-him" class="scene">
-        <div id="particle-source-him" class="particle-source"></div>
-        <h2>His Solitude, A Searching Spark</h2>
-        <p>The other, a <span class="highlight">sapphire spark</span>, pulsed with a curious energy. He journeyed through star fields, a seeker, his light a focused beam exploring the darkness, carrying a question only another heart could answer. His spirit, an adventurer charting unknown skies.</p>
-        <div class="scroll-down-indicator">Scroll</div>
+    <section id="scene-sky" class="scene">
+        <div class="cloud cloud1"></div>
+        <div class="cloud cloud2"></div>
+        <h2>Floating Through Fluffy Clouds!</h2>
+        <p>Next, they found themselves floating up, up, up into the <span class="highlight">Cotton Candy Clouds</span>! They waved at sleepy stars and giggled at shy moonbeams.</p>
+        <div id="flying-hearts-container"></div>
+        <div class="scroll-prompt">Almost There!</div>
     </section>
 
-    <section id="scene-connection" class="scene">
-        <div class="connection-visual"></div>
-        <h2>The Inevitable Convergence</h2>
-        <p>Across the cosmic expanse, an unseen current drew them. A subtle shift in gravity, a shared frequency in their light. Slowly, then with gathering certainty, their paths began to <span class="highlight">intertwine</span>. The universe held its breath.</p>
-        <p>And then, they met. A collision not of destruction, but of <span class="highlight">creation</span>. Their lights merged, not to extinguish, but to ignite something entirely new. A brilliance that outshone solitary stars.</p>
-        <div class="scroll-down-indicator">Scroll</div>
+    <section id="scene-forest" class="scene">
+        <div class="tree tree1"><div class="trunk"></div><div class="leaves">🌳</div></div>
+        <div class="tree tree2"><div class="trunk"></div><div class="leaves">🌲</div></div>
+        <div class="tree tree3"><div class="trunk"></div><div class="leaves">🌴</div></div>
+        <h2>Through the Whispering Woods!</h2>
+        <p>Then, a <span class="highlight">Whispering Woods</span> where trees told silly secrets. "This way!" Dot whispered. "I hear you!" Dash replied, rustling through leaves.</p>
+        <div class="scroll-prompt">So Close!</div>
     </section>
 
-    <section id="scene-universe" class="scene">
-        <div class="universe-text">
-            <h2>A Universe Born of Two</h2>
-            <p>From their union, a new galaxy swirled into existence. Colors neither had known alone now painted the void. Her gentleness tempered his fire; his seeking found solace in her calm. Together, they wove <span class="highlight">constellations of shared dreams</span>, nebulae of laughter, and star clusters of quiet understanding.</p>
-            <p>Their love was not a destination, but a journey. A continuous dance of giving and receiving, of learning and growing, crafting a shared reality more vibrant and profound than either could have imagined apart.</p>
+    <section id="scene-bridge" class="scene">
+        <div class="river">
+            <div class="wave wave1"></div>
+            <div class="wave wave2"></div>
         </div>
-        <div class="scroll-down-indicator">Scroll</div>
+        <div class="rainbow-bridge"></div>
+        <h2>Across the Rainbow Bridge!</h2>
+        <p>A sparkling <span class="highlight">Rainbow Bridge</span> appeared over a giggling river! Dot skipped on red, Dash zipped on blue. They could almost reach!</p>
+        <div class="scroll-prompt">One More!</div>
     </section>
 
-    <section id="scene-legacy" class="scene">
-        <div class="legacy-symbol">∞</div>
-        <h2>An Eternal Echo</h2>
-        <p>Time, in their shared universe, flowed like a gentle river. Their individual lights, now harmonized, became a beacon for other wandering souls. Their love story, etched into the fabric of spacetime, resonated as an <span class="highlight">eternal echo</span> – a testament that even in the vastness of existence, connection is the most powerful force.</p>
-        <p>Their legacy was not in monuments, but in the enduring warmth they cast upon the cosmos, a genuine light promising that love, in its purest form, is the universe's most beautiful creation.</p>
+    <section id="scene-party" class="scene">
+        <div class="confetti-container"></div>
+        <div class="final-hug">💖</div>
+        <h2>Yay! They Met!</h2>
+        <p>Dot and Dash finally met! The world burst into <span class="highlight">colors and sparkles</span>! They gave each other the biggest, happiest hug ever.</p>
+        <p>And they knew their adventures together were just beginning!</p>
     </section>
 
     <script>
-        // --- Particle Background ---
-        const canvas = document.getElementById('starCanvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        let herParticles = [];
-        let himParticles = [];
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        class Particle {
-            constructor(x, y, size, speedX, speedY, color, life = Infinity) {
-                this.x = x;
-                this.y = y;
-                this.size = size;
-                this.speedX = speedX;
-                this.speedY = speedY;
-                this.color = color;
-                this.life = life;
-                this.initialLife = life;
-            }
-
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.life !== Infinity) {
-                    this.life--;
-                }
-                // Simple screen wrap for general particles
-                if (this.life === Infinity) {
-                    if (this.x < 0) this.x = canvas.width;
-                    if (this.x > canvas.width) this.x = 0;
-                    if (this.y < 0) this.y = canvas.height;
-                    if (this.y > canvas.height) this.y = 0;
-                }
-            }
-
-            draw() {
-                ctx.fillStyle = this.color;
-                ctx.globalAlpha = this.life === Infinity ? 0.8 : Math.max(0, this.life / this.initialLife * 0.8);
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.globalAlpha = 1;
-            }
-        }
-
-        function initParticles() {
-            // General stars
-            for (let i = 0; i < 100; i++) {
-                const size = Math.random() * 1.5 + 0.5;
-                const x = Math.random() * canvas.width;
-                const y = Math.random() * canvas.height;
-                const speedX = (Math.random() - 0.5) * 0.2;
-                const speedY = (Math.random() - 0.5) * 0.2;
-                particles.push(new Particle(x, y, size, speedX, speedY, 'rgba(220, 220, 255, 0.7)'));
-            }
-        }
-
-        let herSourceEl = document.getElementById('particle-source-her');
-        let himSourceEl = document.getElementById('particle-source-him');
-        let connectionVisualEl = document.querySelector('#scene-connection .connection-visual');
-
-        let currentScene = 'intro'; // To control particle emission
-
-        function emitCharacterParticles() {
-            const herRect = herSourceEl.getBoundingClientRect();
-            const himRect = himSourceEl.getBoundingClientRect();
-            const connectionRect = connectionVisualEl.getBoundingClientRect();
-
-            if (currentScene === 'her' || currentScene === 'solitudes-active') {
-                if (herParticles.length < 50 && Math.random() < 0.3) {
-                    const x = herRect.left + herRect.width / 2;
-                    const y = herRect.top + herRect.height / 2;
-                    const angle = Math.random() * Math.PI * 2;
-                    const speed = Math.random() * 1 + 0.5;
-                    herParticles.push(new Particle(x, y, Math.random()*2+1, Math.cos(angle)*speed, Math.sin(angle)*speed, 'rgba(255, 128, 176, 0.7)', 100));
-                }
-            }
-            if (currentScene === 'him' || currentScene === 'solitudes-active') {
-                 if (himParticles.length < 50 && Math.random() < 0.3) {
-                    const x = himRect.left + himRect.width / 2;
-                    const y = himRect.top + himRect.height / 2;
-                    const angle = Math.random() * Math.PI * 2;
-                    const speed = Math.random() * 1 + 0.5;
-                    himParticles.push(new Particle(x, y, Math.random()*2+1, Math.cos(angle)*speed, Math.sin(angle)*speed, 'rgba(128, 176, 255, 0.7)', 100));
-                }
-            }
-            if (currentScene === 'connection' && Math.random() < 0.5) {
-                // Emit from center, mixed colors
-                const x = connectionRect.left + connectionRect.width / 2;
-                const y = connectionRect.top + connectionRect.height / 2;
-                const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 1.5 + 1;
-                const color = Math.random() > 0.5 ? 'rgba(255, 128, 176, 0.8)' : 'rgba(128, 176, 255, 0.8)';
-                // Longer life for connection particles
-                particles.push(new Particle(x, y, Math.random()*2.5+1, Math.cos(angle)*speed, Math.sin(angle)*speed, color, 150));
-            }
-            if (currentScene === 'universe' && Math.random() < 0.8) { // More particles for universe
-                // Emit from various places, mixed colors and white
-                const x = Math.random() * canvas.width;
-                const y = Math.random() * canvas.height;
-                const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 0.5 + 0.2;
-                let color = 'rgba(220, 220, 255, 0.6)'; // Default starlight
-                if (Math.random() > 0.6) color = Math.random() > 0.5 ? 'rgba(255, 160, 200, 0.7)' : 'rgba(160, 200, 255, 0.7)'; // Fainter pink/blue
-                particles.push(new Particle(x, y, Math.random()*2+0.5, Math.cos(angle)*speed, Math.sin(angle)*speed, color, 200));
-            }
-
-
-            // Clean up dead character particles
-            herParticles = herParticles.filter(p => p.life > 0);
-            himParticles = himParticles.filter(p => p.life > 0);
-            // Clean up general particles with finite life
-            particles = particles.filter(p => p.life > 0 || p.life === Infinity);
-
-        }
-
-
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            emitCharacterParticles();
-
-            [...particles, ...herParticles, ...himParticles].forEach(particle => {
-                particle.update();
-                particle.draw();
-            });
-            
-            requestAnimationFrame(animate);
-        }
-
-        initParticles();
-        animate();
-
-        // --- Scroll-based Scene Transitions & Particle Control ---
+        const dot = document.getElementById('dot');
+        const dash = document.getElementById('dash');
         const scenes = document.querySelectorAll('.scene');
-        const observerOptions = {
-            root: null, // viewport
-            rootMargin: '0px',
-            threshold: 0.4 // 40% of element is visible
-        };
+        const flyingHeartsContainer = document.getElementById('flying-hearts-container'); // For scene-sky
+        const confettiContainer = document.querySelector('#scene-party .confetti-container');
 
-        const sceneObserver = new IntersectionObserver((entries, observer) => {
+        let currentSceneIndex = 0;
+
+        // Scene visibility
+        const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
-                    
-                    // Update currentScene for particle system
                     const sceneId = entry.target.id;
-                    if (sceneId === 'scene-intro') currentScene = 'intro';
-                    else if (sceneId === 'scene-her') currentScene = 'her';
-                    else if (sceneId === 'scene-him') currentScene = 'him';
-                    else if (sceneId === 'scene-connection') currentScene = 'connection';
-                    else if (sceneId === 'scene-universe') currentScene = 'universe';
-                    else if (sceneId === 'scene-legacy') currentScene = 'legacy';
+                    scenes.forEach((s, index) => { if(s.id === sceneId) currentSceneIndex = index; });
 
-                    // Special handling for combined solitude view
-                    const herScene = document.getElementById('scene-her');
-                    const himScene = document.getElementById('scene-him');
-                    if(herScene.classList.contains('visible') && himScene.classList.contains('visible')) {
-                        currentScene = 'solitudes-active'; // Both are visible, emit from both
-                    } else if (herScene.classList.contains('visible')) {
-                        currentScene = 'her';
-                    } else if (himScene.classList.contains('visible')) {
-                        currentScene = 'him';
+                    // Scene-specific initializations
+                    if (sceneId === 'scene-sky' && flyingHeartsContainer && flyingHeartsContainer.children.length === 0) {
+                        for (let i = 0; i < 5; i++) {
+                            createFlyingHeart();
+                        }
+                    }
+                    if (sceneId === 'scene-party' && confettiContainer && confettiContainer.children.length === 0) {
+                        for (let i = 0; i < 50; i++) {
+                            createConfetti();
+                        }
                     }
 
-
                 } else {
-                    // Optional: fade out scenes when they scroll out of view
-                    // entry.target.classList.remove('visible'); 
-                    // Be careful with this, could make it flicker if threshold is too sensitive
+                    // entry.target.classList.remove('visible'); // Optional: for re-triggering
                 }
             });
-        }, observerOptions);
+        }, { threshold: 0.3 }); // 30% visibility to trigger
 
-        scenes.forEach(scene => {
-            sceneObserver.observe(scene);
+        scenes.forEach(scene => observer.observe(scene));
+        
+        // Initial visibility for the first scene
+        if (scenes.length > 0) {
+             setTimeout(() => {
+                const firstSceneRect = scenes[0].getBoundingClientRect();
+                if (firstSceneRect.top >=0 && firstSceneRect.bottom <= window.innerHeight) {
+                    scenes[0].classList.add('visible');
+                }
+            }, 100);
+        }
+
+
+        function createFlyingHeart() {
+            if (!flyingHeartsContainer) return;
+            const heart = document.createElement('div');
+            heart.classList.add('flying-heart');
+            heart.innerHTML = ['❤️', '🧡', '💛', '💚', '💙', '💜'][Math.floor(Math.random() * 6)];
+            heart.style.left = Math.random() * 80 + 10 + '%'; // Start somewhere across
+            heart.style.top = Math.random() * 60 + 20 + '%'; // Random vertical
+            heart.style.fontSize = (Math.random() * 1.5 + 1) + 'rem';
+            heart.style.animationDelay = Math.random() * 3 + 's';
+            flyingHeartsContainer.appendChild(heart);
+            // Remove after animation to prevent buildup
+            heart.addEventListener('animationend', () => heart.remove());
+        }
+        
+        function createConfetti() {
+            if (!confettiContainer) return;
+            const confetti = document.createElement('div');
+            const types = ['c1', 'c2', 'c3', 'c4', 'c5'];
+            confetti.classList.add('confetti', types[Math.floor(Math.random() * types.length)]);
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.animationDuration = (Math.random() * 2 + 2) + 's'; // 2-4s fall
+            confetti.style.animationDelay = Math.random() * 3 + 's';
+            
+            // Make some spin differently
+            if (Math.random() > 0.5) {
+                confetti.style.width = "20px";
+                confetti.style.height = "10px";
+            }
+            confettiContainer.appendChild(confetti);
+            // Remove after animation
+            confetti.addEventListener('animationend', () => confetti.remove());
+        }
+
+
+        // Character movement based on scroll
+        window.addEventListener('scroll', () => {
+            const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+
+            // --- Dot's Journey (Left to Center-ish) ---
+            // Starts at 10% left, moves towards 40% left by the end.
+            // Vertical movement: bounce and float
+            let dotX = 10 + (scrollPercent * 30); // 10% to 40%
+            let dotY = 50; // % from top
+
+            // Scene-specific vertical for Dot
+            if (currentSceneIndex === 1) { // Hills: Bouncy
+                dotY = 50 + Math.sin(scrollPercent * 20) * 5; // small bounce
+            } else if (currentSceneIndex === 2) { // Sky: Floaty high
+                dotY = 30 - Math.sin(scrollPercent * 10) * 10;
+            } else if (currentSceneIndex === 3) { // Forest: Mid-level
+                dotY = 55 + Math.cos(scrollPercent * 15) * 3;
+            } else if (currentSceneIndex === 4) { // Bridge
+                dotY = 45; // On the bridge
+            } else if (currentSceneIndex === 5) { // Party
+                dotX = 45; // Move closer to center
+                dotY = 50;
+            }
+            dot.style.left = `${dotX}%`;
+            dot.style.top = `${dotY}%`;
+
+
+            // --- Dash's Journey (Right to Center-ish) ---
+            // Starts at 10% right (90% left), moves towards 60% left (40% right)
+            let dashX = 90 - (scrollPercent * 30); // 90% to 60%
+            let dashY = 50;
+
+            // Scene-specific vertical for Dash
+            if (currentSceneIndex === 1) { // Hills: Bouncy
+                dashY = 50 + Math.cos(scrollPercent * 20) * 5; // different bounce
+            } else if (currentSceneIndex === 2) { // Sky: Floaty high
+                dashY = 35 - Math.cos(scrollPercent * 10) * 10;
+            } else if (currentSceneIndex === 3) { // Forest: Mid-level
+                dashY = 52 + Math.sin(scrollPercent * 15) * 3;
+            } else if (currentSceneIndex === 4) { // Bridge
+                dashY = 45; // On the bridge
+            } else if (currentSceneIndex === 5) { // Party
+                dashX = 55; // Move closer to center
+                dashY = 50;
+            }
+            dash.style.left = `${dashX}%`; // Use left for consistency
+            dash.style.top = `${dashY}%`;
+
+
+            // Make them wave or jump on certain scenes if specific condition met
+            if (currentSceneIndex === 0) { // Intro: Waving
+                dot.style.transform = `translateY(-50%) rotate(${Math.sin(Date.now()/200)*15}deg)`;
+                dash.style.transform = `translateY(-50%) rotate(${Math.cos(Date.now()/200)*(-15)}deg)`;
+            } else if (currentSceneIndex === 5) { // Party: Happy jump/spin
+                 dot.style.transform = `translateY(-50%) rotate(${scrollPercent * 720}deg) scale(1.2)`;
+                 dash.style.transform = `translateY(-50%) rotate(${-scrollPercent * 720}deg) scale(1.2)`;
+            }
+            else {
+                dot.style.transform = `translateY(-50%)`;
+                dash.style.transform = `translateY(-50%)`;
+            }
         });
 
-        // Trigger first scene visibility manually if it's already in view on load
-        // (IntersectionObserver might not fire for elements initially in view)
-        setTimeout(() => {
-            const firstScene = document.getElementById('scene-intro');
-            const rect = firstScene.getBoundingClientRect();
-            if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
-                firstScene.classList.add('visible');
-                currentScene = 'intro';
-            }
-        }, 100);
-
-
-        // --- Optional: Smooth scroll for anchor links if you add any ---
-        // document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        //     anchor.addEventListener('click', function (e) {
-        //         e.preventDefault();
-        //         document.querySelector(this.getAttribute('href')).scrollIntoView({
-        //             behavior: 'smooth'
-        //         });
-        //     });
-        // });
-
-        // Console log for a nice message
-        console.log("Cosmic Echoes of Love - A single-file web experience. Crafted with care.");
-        console.log("Scroll down to experience the story unfold.");
+        // Fun click interaction (optional)
+        [dot, dash].forEach(char => {
+            char.addEventListener('click', () => {
+                char.style.transform += ' rotate(360deg) scale(1.2)';
+                setTimeout(() => char.style.transform = char.style.transform.replace(' rotate(360deg) scale(1.2)', ''), 500);
+                
+                // Create a little sparkle on click
+                const sparkle = document.createElement('div');
+                sparkle.innerHTML = '✨';
+                sparkle.style.position = 'absolute';
+                sparkle.style.left = (Math.random()*20-10) + 'px'; // Random offset
+                sparkle.style.top = (Math.random()*20-10) + 'px';
+                sparkle.style.fontSize = '1.5rem';
+                sparkle.style.opacity = '1';
+                sparkle.style.transition = 'opacity 0.5s, transform 0.5s';
+                char.appendChild(sparkle);
+                setTimeout(() => {
+                    sparkle.style.opacity = '0';
+                    sparkle.style.transform = 'translateY(-20px) scale(0.5)';
+                    setTimeout(() => sparkle.remove(), 500);
+                }, 100);
+            });
+        });
+        
+        console.log("Dot & Dash are ready for their adventure! Scroll down!");
 
     </script>
 </body>
