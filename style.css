@@ -127,9 +127,9 @@ img {
   text-decoration: none; /* Ensure buttons that are links don't get underlined by default */
 }
 .btn:hover {
-  background-color: var(--blacky); /* Using --blacky which was defined but not used */
+  background-color: #000000; 
   color: #fff;
-  border-color: var(--primary-button-hover-bg); /* Or var(--blacky) */
+  border-color: var(--primary-button-hover-bg); 
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   text-decoration: none;
 }
