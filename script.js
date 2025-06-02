@@ -157,51 +157,61 @@ if (typeof IntersectionObserver !== 'undefined' && revealElements.length > 0) {
     revealElements.forEach(el => el.classList.add('is-visible'));
 }
 
-// --- NEW THEME TOGGLE LOGIC ---
-    const themeToggleButton = document.getElementById("theme-toggle");
-    const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+// --- THEME TOGGLE LOGIC ---
+const themeToggleButton = document.getElementById("theme-toggle");
+// const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)"); // Keep if needed for OS changes
 
-    function applyTheme(theme) {
+// Function to update button appearance and ARIA attributes
+function updateThemeButton(theme) {
+    if (themeToggleButton) {
         if (theme === "dark") {
-            document.documentElement.setAttribute("data-theme", "dark");
-            if (themeToggleButton) {
-                 themeToggleButton.setAttribute("aria-label", "Switch to light mode");
-                 themeToggleButton.setAttribute("title", "Switch to light mode");
-            }
-        } else { // 'light' or any other value will default to light
-            document.documentElement.removeAttribute("data-theme");
-            if (themeToggleButton) {
-                themeToggleButton.setAttribute("aria-label", "Switch to dark mode");
-                themeToggleButton.setAttribute("title", "Switch to dark mode");
-            }
+            themeToggleButton.setAttribute("aria-label", "Switch to light mode");
+            themeToggleButton.setAttribute("title", "Switch to light mode");
+            // The CSS will handle showing the correct icon (sun/moon)
+        } else {
+            themeToggleButton.setAttribute("aria-label", "Switch to dark mode");
+            themeToggleButton.setAttribute("title", "Switch to dark mode");
         }
     }
+}
 
-    // Load saved theme or explicitly default to light
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) {
-        applyTheme(savedTheme); // Apply saved theme if it exists
-    } else {
-        applyTheme("light");    // Otherwise, explicitly default to light theme
-                                // If you still wanted to respect OS preference as a fallback
-                                // *only if no savedTheme exists*, you could do:
-                                // applyTheme(prefersDarkScheme.matches ? "dark" : "light");
-                                // But for a strict "light as default", the line above is correct.
-    }
+// Get current theme from the <html> tag (set by inline script or default)
+let currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+updateThemeButton(currentTheme); // Initialize button based on what's already set
 
-    if (themeToggleButton) {
-        themeToggleButton.addEventListener("click", () => {
-            const currentTheme = document.documentElement.getAttribute("data-theme");
-            if (currentTheme === "dark") {
-                localStorage.setItem("theme", "light");
-                applyTheme("light");
-            } else {
-                localStorage.setItem("theme", "dark");
-                applyTheme("dark");
-            }
-        });
-    }
- 
+if (themeToggleButton) {
+    themeToggleButton.addEventListener("click", () => {
+        currentTheme = document.documentElement.getAttribute("data-theme"); // Get fresh value
+        if (currentTheme === "dark") {
+            document.documentElement.removeAttribute("data-theme");
+            localStorage.setItem("theme", "light");
+            updateThemeButton("light");
+        } else {
+            document.documentElement.setAttribute("data-theme", "dark");
+            localStorage.setItem("theme", "dark");
+            updateThemeButton("dark");
+        }
+    });
+}
+
+// Optional: If you still want to react to OS theme changes *if no user preference is set*
+// This part might be less critical if the inline script already handles OS preference on initial load.
+// const prefersDarkSchemeListener = (e) => {
+//     if (!localStorage.getItem("theme")) { // Only if user hasn't set a preference via the button
+//         const newTheme = e.matches ? "dark" : "light";
+//         if (newTheme === "dark") {
+//             document.documentElement.setAttribute("data-theme", "dark");
+//         } else {
+//             document.documentElement.removeAttribute("data-theme");
+//         }
+//         updateThemeButton(newTheme);
+//     }
+// };
+// if (typeof prefersDarkScheme !== 'undefined') {
+//    prefersDarkScheme.addEventListener("change", prefersDarkSchemeListener);
+// }
+
+// --- END THEME TOGGLE LOGIC ---
 
 	function closeMobileMenu()
 	{
