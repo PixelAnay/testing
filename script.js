@@ -12,6 +12,35 @@ document.addEventListener("DOMContentLoaded", function ()
 	let mainNavLinksForHighlight = null;
 	let mobileNavLinksForHighlight = null;
 
+
+	// Inside DOMContentLoaded
+const revealElements = document.querySelectorAll('.project-card, .timeline-item, .skill-tag, .blog-post-summary, .about-content, .about-image-container, .skills-header, .skill-category, #resume.centered-action, #contact .contact-form, .hero > *:not(.btn)'); // Add more selectors as needed
+
+const revealObserverOptions = {
+    root: null, // relative to document viewport
+    rootMargin: '0px',
+    threshold: 0.1 // 10% of item is visible
+};
+
+const revealCallback = (entries, observer) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target); // Optional: stop observing once visible
+        }
+    });
+};
+
+if (typeof IntersectionObserver !== 'undefined' && revealElements.length > 0) {
+    const revealObserver = new IntersectionObserver(revealCallback, revealObserverOptions);
+    revealElements.forEach(el => {
+        revealObserver.observe(el);
+    });
+} else {
+    // Fallback for older browsers: make everything visible immediately
+    revealElements.forEach(el => el.classList.add('is-visible'));
+}
+
 // --- NEW THEME TOGGLE LOGIC ---
     const themeToggleButton = document.getElementById("theme-toggle");
     const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
@@ -56,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function ()
             }
         });
     }
-
+ 
 
 	function closeMobileMenu()
 	{

@@ -7,6 +7,19 @@
 img {
   vertical-align: middle;
 }
+
+/* For project cards, for example */
+.project-card, .timeline-item, .skill-tag, .blog-post-summary {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.project-card.is-visible, .timeline-item.is-visible, .skill-tag.is-visible, .blog-post-summary.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 .btn,
 body {
   font-size: 1rem;
