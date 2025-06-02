@@ -125,6 +125,7 @@ img {
   border-radius: var(--border-radius-md);
   transition: 0.15s ease-in-out;
   text-decoration: none; /* Ensure buttons that are links don't get underlined by default */
+
 }
 .btn:hover {
   background-color: #000000; 

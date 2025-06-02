@@ -157,6 +157,7 @@ if (typeof IntersectionObserver !== 'undefined' && revealElements.length > 0) {
     revealElements.forEach(el => el.classList.add('is-visible'));
 }
 
+
 // --- NEW THEME TOGGLE LOGIC ---
     const themeToggleButton = document.getElementById("theme-toggle");
     const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
