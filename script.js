@@ -13,6 +13,122 @@ document.addEventListener("DOMContentLoaded", function ()
 	let mobileNavLinksForHighlight = null;
 
 
+// Inside DOMContentLoaded
+const contactForm = document.getElementById('contactForm');
+if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const submitButton = form.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.textContent;
+        submitButton.textContent = 'Sending...';
+        submitButton.disabled = true;
+
+        const formData = new FormData(form);
+        fetch(form.action, {
+            method: form.method,
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                submitButton.textContent = 'Message Sent!';
+                form.reset(); // Clear the form
+                setTimeout(() => {
+                     submitButton.textContent = originalButtonText;
+                     submitButton.disabled = false;
+                }, 15000);
+                // Optionally show a more prominent success message div
+            } else {
+                response.json().then(data => {
+                    if (Object.hasOwn(data, 'errors')) {
+                        alert(data["errors"].map(error => error["message"]).join(", "));
+                    } else {
+                        alert('Oops! There was a problem submitting your form.');
+                    }
+                    submitButton.textContent = originalButtonText;
+                    submitButton.disabled = false;
+                })
+            }
+        }).catch(error => {
+            alert('Oops! There was a problem submitting your form.');
+            submitButton.textContent = originalButtonText;
+            submitButton.disabled = false;
+        });
+    });
+}
+
+    // --- BACK TO TOP BUTTON LOGIC ---
+    const backToTopButton = document.getElementById("backToTopBtn");
+    
+    // Determine the trigger element based on the current page or a default
+    let triggerElement;
+    const blogSection = document.getElementById("blog"); // Specifically for index.html
+    const allProjectsSection = document.getElementById("all-projects"); // For projects.html
+    const allBlogPostsSection = document.getElementById("all-blog-posts"); // For blogs.html
+    const allSkillsSection = document.getElementById("all-skills"); // For skills.html
+    const mainFooter = document.querySelector("footer.main-footer");
+
+    // Prioritize page-specific content sections, then fallback to footer
+    if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
+        triggerElement = blogSection || mainFooter; // Use blog section if on index, else footer
+    } else if (allProjectsSection) {
+        triggerElement = mainFooter; // On projects page, trigger when footer is near
+    } else if (allBlogPostsSection) {
+        triggerElement = mainFooter; // On all blogs page, trigger when footer is near (as it's long)
+    } else if (allSkillsSection) {
+        triggerElement = mainFooter; // On skills page, maybe footer is fine, or adjust if needed
+    }
+     else {
+        triggerElement = mainFooter; // Default to footer for any other pages
+    }
+
+
+    if (backToTopButton && triggerElement) { // Ensure the button and a triggerElement exist
+        window.addEventListener("scroll", function() {
+            const documentScrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            
+            // Condition 1: Has the user scrolled down a significant amount?
+            // e.g., at least 70% of viewport height.
+            const scrolledFarEnough = documentScrollTop > (window.innerHeight * 0.7);
+
+            // Condition 2: Is the top of the triggerElement visible in the viewport?
+            const triggerRect = triggerElement.getBoundingClientRect();
+            // Show if the top of the trigger element is within the viewport or has scrolled past the top.
+            // A common approach is to show when the trigger element starts entering from the bottom.
+            // For showing when the "blog" section appears, we want its top to be less than window.innerHeight.
+            const triggerElementTopIsVisible = triggerRect.top < window.innerHeight;
+
+
+            if (scrolledFarEnough && triggerElementTopIsVisible) {
+                backToTopButton.style.display = "block";
+            } else {
+                backToTopButton.style.display = "none";
+            }
+        });
+
+        backToTopButton.addEventListener("click", () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    } else if (backToTopButton) {
+        // Fallback if no specific triggerElement is found (e.g. future pages)
+        // Show after scrolling down by a generic large amount, e.g., 1.5 times viewport height
+        window.addEventListener("scroll", function() {
+            const fallbackOffset = window.innerHeight * 1.5;
+            if ((document.documentElement.scrollTop || document.body.scrollTop) > fallbackOffset) {
+                backToTopButton.style.display = "block";
+            } else {
+                backToTopButton.style.display = "none";
+            }
+        });
+         backToTopButton.addEventListener("click", () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+    // --- END BACK TO TOP BUTTON LOGIC ---
+
+
 	// Inside DOMContentLoaded
 const revealElements = document.querySelectorAll('.project-card, .timeline-item, .skill-tag, .blog-post-summary, .about-content, .about-image-container, .skills-header, .skill-category, #resume.centered-action, #contact .contact-form, .hero > *:not(.btn)'); // Add more selectors as needed
 
