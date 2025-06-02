@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Apply stagger delays before observing
     const staggerGroups = {
         '.project-card': 100,
-        '.skill-tag': 50,
+        '.skill-tag': 10, // Stagger interval for skill tags
         '.timeline-item': 100,
         '.blog-post-summary': 100
         // Add other selectors if needed
@@ -135,10 +135,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const items = document.querySelectorAll(selector);
         items.forEach((item, index) => {
             const delay = index * staggerGroups[selector];
-            // The transition-delay applies to all transitioned properties by default
-            // If specific properties need different delays, CSS custom properties or more complex JS is needed.
-            // For this setup, a single delay for the reveal (opacity, transform) is fine.
-            item.style.transitionDelay = `${delay}ms`;
+            // Use a CSS custom property for the stagger delay
+            item.style.setProperty('--reveal-stagger-delay', `${delay}ms`);
         });
     }
     
@@ -160,10 +158,20 @@ document.addEventListener("DOMContentLoaded", function () {
     if (typeof IntersectionObserver !== 'undefined' && revealElements.length > 0) {
         const revealObserver = new IntersectionObserver(revealCallback, revealObserverOptions);
         revealElements.forEach(el => {
+            // Ensure all revealElements have the custom property defined, defaulting to 0ms if not in a staggerGroup
+            if (!el.style.getPropertyValue('--reveal-stagger-delay')) {
+                el.style.setProperty('--reveal-stagger-delay', '0ms');
+            }
             revealObserver.observe(el);
         });
-    } else {
-        revealElements.forEach(el => el.classList.add('is-visible'));
+    } else { // Fallback if IntersectionObserver is not supported
+        revealElements.forEach(el => {
+            el.classList.add('is-visible');
+            // Ensure the custom property is set for fallback as well
+            if (!el.style.getPropertyValue('--reveal-stagger-delay')) {
+                el.style.setProperty('--reveal-stagger-delay', '0ms');
+            }
+        });
     }
 
 
