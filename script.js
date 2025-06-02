@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
         
         function initParticles(theme) {
             particlesArray = [];
-            const numberOfParticles = Math.floor((heroParticlesCanvas.width * heroParticlesCanvas.height) / 14000); // Responsive particle count
+            const numberOfParticles = Math.floor((heroParticlesCanvas.width * heroParticlesCanvas.height) / 11000); // Responsive particle count
             const particleColors = getParticleThemeColors(theme);
 
             for (let i = 0; i < numberOfParticles; i++) {
