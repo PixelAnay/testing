@@ -65,7 +65,245 @@ a {
   --border-radius-lg: 0.5rem;
   --box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.05);
   --box-shadow-lg: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.07);
+      --primary-button-text-color-light: var(--text-color); /* Default for light theme */
+    --primary-button-text-color-dark: #ffffff; /* White text for dark theme buttons */
+    --logo-color-light: var(--text-color);
+    --logo-color-dark: var(--text-color); /* This will be overridden by data-theme */
 }
+
+
+/* Dark theme overrides */
+[data-theme="dark"] {
+    --primary-button-bg: #4A90E2;        /* A pleasant blue for buttons */
+    --primary-button-hover-bg: #357ABD;   /* Darker blue for hover */
+    --text-color: #e4e6eb;               /* Light grey for main text */
+    --background-color: #18191a;         /* Very dark grey, almost black, for background */
+    --secondary-text-color: #b0b3b8;     /* Lighter grey for secondary text */
+    --border-color: #3a3b3c;             /* Dark grey for borders */
+    --accent-color-for-lines: #4A90E2;   /* Consistent accent blue */
+
+    --skill-tag-bg: #242526;             /* Darker than background for tags */
+    --skill-tag-text: #e4e6eb;           /* Light text for tags */
+    --skill-tag-hover-bg: #4A90E2;       /* Accent color for hover */
+    --skill-tag-hover-text: #ffffff;     /* White text on hover */
+
+    --box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.3);
+    --box-shadow-lg: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.35);
+
+    /* Specific adjustments for buttons in dark mode */
+    --primary-button-text-color-light: var(--primary-button-text-color-dark); /* Override for dark theme */
+    --logo-color-dark: #e4e6eb; /* Ensure logo text is light in dark mode */
+}
+
+/* Adjust button text color based on theme */
+.btn {
+    color: var(--primary-button-text-color-light); /* Uses the correct variable now */
+}
+
+/* Secondary button adjustments for dark mode */
+[data-theme="dark"] .btn-secondary {
+    border-color: var(--text-color); /* Uses light grey border */
+    color: var(--text-color); /* Uses light grey text */
+}
+[data-theme="dark"] .btn-secondary:hover,
+[data-theme="dark"] .skills-list li:hover { /* Also apply to skills list item hover */
+    background-color: var(--text-color); /* Light grey background */
+    color: var(--background-color); /* Dark background for text */
+    border-color: var(--text-color);
+}
+
+/* Outline primary button for dark mode */
+[data-theme="dark"] .btn-outline-primary {
+    color: var(--text-color);
+    background-color: transparent;
+    border-color: var(--text-color);
+}
+[data-theme="dark"] .btn-outline-primary:hover {
+    color: var(--background-color);
+    background-color: var(--text-color);
+    border-color: var(--text-color);
+}
+
+/* Ensure logo text and SVG pick up the theme color */
+.logo, .logo svg { /* General rule for logo color */
+    color: var(--logo-color-light);
+    fill: var(--logo-color-light);
+}
+[data-theme="dark"] .logo,
+[data-theme="dark"] .logo svg {
+    color: var(--logo-color-dark);
+    fill: var(--logo-color-dark);
+}
+
+
+/* Header, Nav, and Mobile Nav Panel for dark mode */
+[data-theme="dark"] .main-header,
+[data-theme="dark"] .mobile-nav-panel li a {
+    border-bottom-color: var(--border-color);
+}
+[data-theme="dark"] .mobile-nav-panel {
+    background-color: var(--background-color); /* Ensure panel bg is dark */
+}
+[data-theme="dark"] .mobile-nav-panel li a.active,
+[data-theme="dark"] .mobile-nav-panel li a:hover {
+  background-color: #242526; /* Slightly lighter than main dark bg */
+  color: var(--accent-color-for-lines);
+}
+[data-theme="dark"] .main-nav a,
+[data-theme="dark"] .mobile-nav-panel li a {
+    color: var(--text-color);
+}
+[data-theme="dark"] .main-nav a.active,
+[data-theme="dark"] .main-nav a:hover {
+  color: var(--accent-color-for-lines);
+}
+[data-theme="dark"] .main-nav a::after {
+  background: var(--accent-color-for-lines);
+}
+[data-theme="dark"] .hamburger-menu .bar {
+    background-color: var(--text-color);
+}
+
+/* Sections, Project Cards, Blog Posts for dark mode */
+[data-theme="dark"] .hero,
+[data-theme="dark"] .project-card,
+[data-theme="dark"] .skills-list li,
+[data-theme="dark"] section,
+[data-theme="dark"] .blog-post-summary,
+[data-theme="dark"] .contact-form {
+    background-color: var(--background-color); /* Main dark background */
+}
+[data-theme="dark"] .project-card,
+[data-theme="dark"] .blog-post-summary,
+[data-theme="dark"] .contact-form {
+    border-color: var(--border-color);
+}
+[data-theme="dark"] .project-card h3,
+[data-theme="dark"] .blog-post-summary h3 {
+    color: var(--text-color);
+}
+
+/* Timeline for dark mode */
+[data-theme="dark"] .timeline::before {
+    background-color: #555; /* Darker line for timeline */
+}
+[data-theme="dark"] .timeline-icon {
+    background-color: var(--primary-button-bg);
+    color: var(--primary-button-text-color-dark);
+    border-color: var(--background-color);
+}
+[data-theme="dark"] .timeline-item h3 {
+    color: var(--text-color);
+}
+[data-theme="dark"] .timeline-item .company-school {
+    color: #c0c0c0; /* Lighter grey for company/school */
+}
+
+/* Contact form inputs for dark mode */
+[data-theme="dark"] .contact-form label {
+    color: var(--text-color);
+}
+[data-theme="dark"] .contact-form input[type="email"],
+[data-theme="dark"] .contact-form input[type="text"],
+[data-theme="dark"] .contact-form textarea {
+  background-color: #242526; /* Slightly lighter than main bg */
+  color: var(--text-color);
+  border-color: #555; /* Darker border for inputs */
+}
+[data-theme="dark"] .contact-form input[type="email"]:focus,
+[data-theme="dark"] .contact-form input[type="text"]:focus,
+[data-theme="dark"] .contact-form textarea:focus {
+  border-color: var(--accent-color-for-lines);
+  box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25); /* Adjusted focus shadow */
+}
+
+/* Skills page for dark mode */
+[data-theme="dark"] .skills-header h1,
+[data-theme="dark"] .skill-category h3 {
+    color: var(--text-color);
+}
+[data-theme="dark"] .skill-category h3 {
+    border-bottom-color: var(--border-color);
+}
+
+/* Footer for dark mode */
+[data-theme="dark"] .main-footer {
+    border-top-color: var(--border-color);
+    background-color: var(--background-color); /* Ensure footer bg is dark */
+}
+[data-theme="dark"] .social-icons a {
+    color: var(--text-color);
+}
+[data-theme="dark"] .social-icons a:hover {
+    color: var(--accent-color-for-lines);
+}
+[data-theme="dark"] .copy-button .copy-icon-svg {
+    stroke: var(--secondary-text-color);
+}
+[data-theme="dark"] .copy-button:hover .copy-icon-svg {
+    stroke: var(--accent-color-for-lines);
+}
+[data-theme="dark"] #emailToCopy.footer-link,
+[data-theme="dark"] .main-footer a.footer-link {
+    color: var(--accent-color-for-lines);
+}
+[data-theme="dark"] #emailToCopy.footer-link:hover,
+[data-theme="dark"] .main-footer a.footer-link:hover {
+    color: #6eb1f7; /* Slightly lighter accent for hover */
+}
+
+
+/* --- Theme Toggle Button CSS --- */
+.theme-toggle-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    margin-left: 15px; /* Adjust as needed */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color); /* Initial color */
+    transition: color 0.3s ease;
+}
+
+.theme-toggle-button svg {
+    width: 22px; /* Consistent size */
+    height: 22px;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Hide moon icon by default (in light mode) */
+.theme-toggle-button .moon-icon {
+    display: none;
+}
+/* Hide sun icon in dark mode */
+[data-theme="dark"] .theme-toggle-button .sun-icon {
+    display: none;
+}
+/* Show moon icon in dark mode */
+[data-theme="dark"] .theme-toggle-button .moon-icon {
+    display: inline-block;
+}
+[data-theme="dark"] .theme-toggle-button {
+    color: var(--text-color); /* Ensure icon color updates in dark mode */
+}
+
+/* Adjusting theme toggle button position for smaller screens */
+@media (max-width: 991.98px) {
+    .theme-toggle-button {
+        order: 2; /* Place it after logo but before hamburger */
+        margin-left: auto; /* Push to the right */
+        margin-right: 10px;
+    }
+     .main-header .container .logo {
+        order: 1;
+    }
+    .main-header .container .hamburger-menu {
+        order: 3;
+    }
+}
+
 *,
 ::after,
 ::before {

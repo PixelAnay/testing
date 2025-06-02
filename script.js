@@ -12,6 +12,52 @@ document.addEventListener("DOMContentLoaded", function ()
 	let mainNavLinksForHighlight = null;
 	let mobileNavLinksForHighlight = null;
 
+// --- NEW THEME TOGGLE LOGIC ---
+    const themeToggleButton = document.getElementById("theme-toggle");
+    const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+
+    function applyTheme(theme) {
+        if (theme === "dark") {
+            document.documentElement.setAttribute("data-theme", "dark");
+            if (themeToggleButton) {
+                 themeToggleButton.setAttribute("aria-label", "Switch to light mode");
+                 themeToggleButton.setAttribute("title", "Switch to light mode");
+            }
+        } else { // 'light' or any other value will default to light
+            document.documentElement.removeAttribute("data-theme");
+            if (themeToggleButton) {
+                themeToggleButton.setAttribute("aria-label", "Switch to dark mode");
+                themeToggleButton.setAttribute("title", "Switch to dark mode");
+            }
+        }
+    }
+
+    // Load saved theme or explicitly default to light
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) {
+        applyTheme(savedTheme); // Apply saved theme if it exists
+    } else {
+        applyTheme("light");    // Otherwise, explicitly default to light theme
+                                // If you still wanted to respect OS preference as a fallback
+                                // *only if no savedTheme exists*, you could do:
+                                // applyTheme(prefersDarkScheme.matches ? "dark" : "light");
+                                // But for a strict "light as default", the line above is correct.
+    }
+
+    if (themeToggleButton) {
+        themeToggleButton.addEventListener("click", () => {
+            const currentTheme = document.documentElement.getAttribute("data-theme");
+            if (currentTheme === "dark") {
+                localStorage.setItem("theme", "light");
+                applyTheme("light");
+            } else {
+                localStorage.setItem("theme", "dark");
+                applyTheme("dark");
+            }
+        });
+    }
+
+
 	function closeMobileMenu()
 	{
 		if (mobileNavPanel && mobileNavPanel.classList.contains("open"))
