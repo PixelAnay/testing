@@ -677,7 +677,8 @@ section#all-skills {
   position: relative;
   margin-bottom: 40px;
   opacity: 0; /* For reveal */
-  transition: opacity 1s ease-out, transform 0.3s ease-out;
+  transform: translateX(-30px); /* For reveal, coming from side */
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
 }
 .timeline-item.is-visible {
     opacity: 1;
