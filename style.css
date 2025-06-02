@@ -1112,5 +1112,5 @@ section#all-skills { /* Styles for the dedicated skills page */
   .skills-grid { justify-content: center; } /* Center tags on mobile if they don't fill width */
 
   #backToTopBtn { bottom: 15px; right: 15px; padding: 8px; } /* Smaller and less padding on mobile */
-  #backToTopBtn svg { width: 18px; height: 18px; }
+  #backToTopBtn svg { width: 32px; height: 32px; }
 }
