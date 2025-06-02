@@ -1272,5 +1272,5 @@ section#all-skills {
   .skills-grid { justify-content: center; }
 
   #backToTopBtn { bottom: 15px; right: 15px; padding: 8px; }
-  #backToTopBtn svg { width: 35px; height: 35px; } /* Unified size with desktop */
+  #backToTopBtn svg { width: 20px; height: 20px; } /* Unified size with desktop */
 }
