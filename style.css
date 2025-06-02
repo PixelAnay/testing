@@ -259,7 +259,7 @@ a {
     border: none;
     cursor: pointer;
     padding: 5px;
-    margin-left: 15px; /* Adjust as needed */
+    /* margin-left: 15px;  Adjust as needed */
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -813,7 +813,7 @@ section {
 }
 #blog .blog-post-summary h3 {
   font-size: 1.5rem;
-  color: #515151;
+  /* color: #515151; */
   font-weight: 700;
 }
 #blog .blog-post-summary p {
