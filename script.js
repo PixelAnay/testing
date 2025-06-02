@@ -167,19 +167,20 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-     // --- THEME TOGGLE LOGIC ---
+// --- UPDATED THEME TOGGLE LOGIC ---
     const themeToggleButton = document.getElementById("theme-toggle");
-    const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
 
+    // This function now primarily manages applying the theme attribute
+    // AND updating the toggle button's state (ARIA labels, title).
     function applyTheme(theme) {
         if (theme === "dark") {
             document.documentElement.setAttribute("data-theme", "dark");
             if (themeToggleButton) {
-                themeToggleButton.setAttribute("aria-label", "Switch to light mode");
-                themeToggleButton.setAttribute("title", "Switch to light mode");
+                 themeToggleButton.setAttribute("aria-label", "Switch to light mode");
+                 themeToggleButton.setAttribute("title", "Switch to light mode");
             }
-        } else {
-            document.documentElement.removeAttribute("data-theme"); // Assumes no attribute means light
+        } else { // 'light'
+            document.documentElement.removeAttribute("data-theme");
             if (themeToggleButton) {
                 themeToggleButton.setAttribute("aria-label", "Switch to dark mode");
                 themeToggleButton.setAttribute("title", "Switch to dark mode");
@@ -187,27 +188,31 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme) {
-        applyTheme(savedTheme);
-    } else {
-        // --- MODIFICATION HERE ---
-        applyTheme("dark"); // Default to dark
-        // --- END MODIFICATION ---
-    }
+    // Initialize the theme and button state.
+    // The inline script has already attempted to set the 'data-theme' attribute.
+    // This ensures the button's ARIA labels and titles are correct based on localStorage
+    // or the default 'dark' theme if localStorage is empty.
+    const initialTheme = localStorage.getItem("theme") || 'dark'; // Default to 'dark' if no theme in localStorage
+    applyTheme(initialTheme);
+
 
     if (themeToggleButton) {
         themeToggleButton.addEventListener("click", () => {
-            const currentTheme = document.documentElement.getAttribute("data-theme");
-            if (currentTheme === "dark") {
-                localStorage.setItem("theme", "light");
-                applyTheme("light");
+            // Determine the new theme by checking the current 'data-theme' attribute
+            const currentAttributeTheme = document.documentElement.getAttribute("data-theme");
+            let newTheme;
+
+            if (currentAttributeTheme === "dark") {
+                newTheme = "light";
             } else {
-                localStorage.setItem("theme", "dark");
-                applyTheme("dark");
+                newTheme = "dark";
             }
+            
+            localStorage.setItem("theme", newTheme);
+            applyTheme(newTheme);
         });
     }
+// --- END UPDATED THEME TOGGLE LOGIC ---
     // --- MOBILE MENU & NAVIGATION ---
     function closeMobileMenu() {
         if (mobileNavPanel && mobileNavPanel.classList.contains("open")) {
