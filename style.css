@@ -1077,6 +1077,7 @@ section#all-skills {
     opacity: 1;
   }
 }
+
 @media (max-width: 991.98px) {
   #about .container,
   #about .section-title {
