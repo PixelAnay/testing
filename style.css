@@ -755,7 +755,8 @@ section#all-skills { /* Styles for the dedicated skills page */
 .social-icons a:hover {
   color: var(--primary-button-bg); /* Or your preferred accent */
   text-decoration: none;
-  transform: scale(1.1); /* Pop effect */
+  transform: scale(1.1); /* Pop effect on hover */
+
 }
 .social-icons svg {
   width: 26px;
