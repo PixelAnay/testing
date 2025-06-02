@@ -33,19 +33,19 @@ if (contactForm) {
             }
         }).then(response => {
             if (response.ok) {
-                submitButton.textContent = 'Message Sent!';
+                submitButton.textContent = 'Message Sent! Will get back to you soon.';
                 form.reset(); // Clear the form
                 setTimeout(() => {
                      submitButton.textContent = originalButtonText;
                      submitButton.disabled = false;
-                }, 15000);
+                }, 10000);
                 // Optionally show a more prominent success message div
             } else {
                 response.json().then(data => {
                     if (Object.hasOwn(data, 'errors')) {
                         alert(data["errors"].map(error => error["message"]).join(", "));
                     } else {
-                        alert('Oops! There was a problem submitting your form.');
+                        alert('Oops! There was a problem submitting your form. You can contact me at pixelanay@gmail.com');
                     }
                     submitButton.textContent = originalButtonText;
                     submitButton.disabled = false;
