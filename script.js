@@ -1,21 +1,7 @@
 // script.js
 document.addEventListener("DOMContentLoaded", function() {
 	const header = document.querySelector(".main-header");
-    let headerOffset = 70; // Default
-
-	// Set CSS --header-height custom property and update headerOffset
-	if (header) {
-        const updateHeaderSizing = () => {
-            const currentHeaderHeight = header.offsetHeight;
-            document.documentElement.style.setProperty('--header-height', currentHeaderHeight + 'px');
-            headerOffset = currentHeaderHeight; // Update JS variable used for scroll calculations
-        };
-		updateHeaderSizing();
-        // Consider recalculating on resize if header content can change its height significantly
-        // window.addEventListener('resize', updateHeaderSizing);
-	}
-
-
+	const headerOffset = header ? header.offsetHeight : 70;
 	const hamburger = document.querySelector(".hamburger-menu");
 	const mobileNavPanel = document.querySelector(".mobile-nav-panel");
 	const yearSpan = document.getElementById("currentYear");
@@ -307,19 +293,20 @@ document.addEventListener("DOMContentLoaded", function() {
 				themeToggleButton.setAttribute("title", "Switch to dark mode");
 			}
 		}
+		// Update hero particle theme if the function exists
 		if (typeof window.updateHeroParticleTheme === 'function') {
 			window.updateHeroParticleTheme(theme);
 		}
 	}
 	const initialTheme = localStorage.getItem("theme") || 'dark';
-	applyTheme(initialTheme);
+	applyTheme(initialTheme); // Apply initial theme and update particles
 
 	if (themeToggleButton) {
 		themeToggleButton.addEventListener("click", () => {
 			const currentAttributeTheme = document.documentElement.getAttribute("data-theme");
 			let newTheme = (currentAttributeTheme === "dark") ? "light" : "dark";
 			localStorage.setItem("theme", newTheme);
-			applyTheme(newTheme);
+			applyTheme(newTheme); // Apply new theme and update particles
 		});
 	}
 
@@ -332,9 +319,6 @@ document.addEventListener("DOMContentLoaded", function() {
 	function closeMobileMenu() {
 		if (mobileNavPanel && mobileNavPanel.classList.contains("open")) {
 			mobileNavPanel.classList.remove("open");
-			document.body.classList.remove("mobile-nav-active");
-			document.documentElement.style.overflow = ''; // Restore scroll on html
-			document.body.style.overflow = ''; // Restore scroll on body
 			if (hamburger) {
 				hamburger.classList.remove("is-active");
 				hamburger.setAttribute("aria-expanded", "false");
@@ -346,7 +330,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		const linkElement = this;
 		const hrefAttribute = linkElement.getAttribute("href");
 
-		if (mobileNavPanel && mobileNavPanel.classList.contains("open") && mobileNavPanel.contains(linkElement)) {
+		if (mobileNavPanel && mobileNavPanel.contains(linkElement)) {
 			closeMobileMenu();
 		}
 
@@ -363,7 +347,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			const targetElement = document.querySelector(targetUrl.hash);
 			if (targetElement) {
 				const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
-				const offsetPosition = elementPosition - headerOffset; // Use updated headerOffset
+				const offsetPosition = elementPosition - headerOffset;
 				window.scrollTo({
 					top: offsetPosition,
 					behavior: "smooth"
@@ -383,14 +367,6 @@ document.addEventListener("DOMContentLoaded", function() {
 	if (hamburger && mobileNavPanel) {
 		hamburger.addEventListener("click", () => {
 			const isOpen = mobileNavPanel.classList.toggle("open");
-			document.body.classList.toggle("mobile-nav-active", isOpen);
-			if (isOpen) {
-				document.documentElement.style.overflow = 'hidden'; // Prevent scroll on html
-				document.body.style.overflow = 'hidden'; // Prevent scroll on body
-			} else {
-				document.documentElement.style.overflow = ''; // Restore scroll
-				document.body.style.overflow = ''; // Restore scroll
-			}
 			hamburger.classList.toggle("is-active", isOpen);
 			hamburger.setAttribute("aria-expanded", isOpen);
 		});
@@ -407,6 +383,7 @@ document.addEventListener("DOMContentLoaded", function() {
 	const currentPathForNav = window.location.pathname.replace(/\/$/, '');
 	const currentHash = window.location.hash;
 	const isIndexPageForNav = currentPathForNav.endsWith('index.html') || currentPathForNav === '' || currentPathForNav.endsWith('/portfolio') || currentPathForNav === '/portfolio';
+
 
 	function setActiveNavLink() {
 		let activePath = window.location.pathname.replace(/\/$/, '');
@@ -425,41 +402,44 @@ document.addEventListener("DOMContentLoaded", function() {
 				linkPath = linkPath.substring(0, linkPath.lastIndexOf('index.html'));
 				if (linkPath.endsWith('/')) linkPath = linkPath.slice(0, -1);
 			}
-			let tempActivePath = activePath; // Use a temporary activePath for comparison
-			if (tempActivePath.endsWith('index.html')) {
-				tempActivePath = tempActivePath.substring(0, tempActivePath.lastIndexOf('index.html'));
-				if (tempActivePath.endsWith('/')) tempActivePath = tempActivePath.slice(0, -1);
+
+			if (linkPath === '' && activePath.endsWith('/portfolio')) { // Handle case where link is "/" but current path is "/portfolio/"
+				activePath = '';
+			}
+			if (linkPath === '/portfolio' && activePath === '') { // Handle case where link is "/portfolio/" but current path is "/"
+				// Don't do anything here, let the normal comparison proceed
 			}
 
 
-			if (linkPath === tempActivePath || (linkPath === "/portfolio" && tempActivePath === "") || (linkPath === "" && tempActivePath === "/portfolio")) {
+			if (linkPath === activePath) {
 				if (isIndexPageForNav && linkHash && linkHash === activeHash) {
 					link.classList.add('active');
 					foundActive = true;
 					return;
 				}
 				if (isIndexPageForNav && !linkHash && !activeHash && !foundActive) {
-					if (linkHref === "index.html" || linkHref === "./" || linkHref === "/" || linkHref === "#about" || linkHref.startsWith("index.html#about")) {
+					if (linkHref === "index.html" || linkHref === "./" || linkHref === "/" || linkHref === "#about") {
 						link.classList.add('active');
 						foundActive = true;
 					}
-				} else if (!isIndexPageForNav && (!linkHash || linkHash === "#") && !foundActive) { // For non-index pages, match if no hash or empty hash
-                    link.classList.add('active');
-                    foundActive = true;
-                }
+				} else if (!isIndexPageForNav && !linkHash && !foundActive) {
+					link.classList.add('active');
+					foundActive = true;
+				}
 			}
 		});
 
 		if (isIndexPageForNav && !activeHash && !foundActive) {
 			allNavLinks.forEach(link => {
-				if (foundActive) return;
+				if (foundActive) return; // if already activated one via "#about" in previous block
 				const linkHref = link.getAttribute('href');
-				if (linkHref === 'index.html' || linkHref === '#' || linkHref === './' || linkHref.startsWith('#about') || linkHref.startsWith('index.html#about')) {
+				if (linkHref === 'index.html' || linkHref === '#' || linkHref === './' || linkHref.startsWith('#about')) {
 					link.classList.add('active');
 					foundActive = true;
 				}
 			});
 		}
+		// If still no active link and on index page, default to #about or first section
 		if (isIndexPageForNav && !foundActive && indexPageSectionsForNav && indexPageSectionsForNav.length > 0) {
 			const firstSectionId = indexPageSectionsForNav[0].id;
 			allNavLinks.forEach(link => {
@@ -479,7 +459,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		const currentScroll = window.pageYOffset;
 
 		indexPageSectionsForNav.forEach(section => {
-			const sectionTop = section.offsetTop - headerOffset - 50; // Use updated headerOffset
+			const sectionTop = section.offsetTop - headerOffset - 50;
 			const sectionBottom = sectionTop + section.offsetHeight;
 			if (currentScroll >= sectionTop && currentScroll < sectionBottom) {
 				currentSectionId = section.getAttribute("id");
@@ -491,20 +471,20 @@ document.addEventListener("DOMContentLoaded", function() {
 			if (lastSection) currentSectionId = lastSection.id;
 		}
 
+
 		if (!currentSectionId && currentScroll < (indexPageSectionsForNav[0].offsetTop - headerOffset - 50) && indexPageSectionsForNav[0]) {
 			currentSectionId = indexPageSectionsForNav[0].id;
 		}
 
+
 		allNavLinks.forEach(link => {
 			link.classList.remove('active');
 			const linkHref = link.getAttribute('href');
-			if (linkHref) {
-				const hashPart = linkHref.includes('#') ? linkHref.substring(linkHref.indexOf('#') + 1) : null;
-				if (hashPart && hashPart === currentSectionId) {
-					link.classList.add('active');
-				} else if ((linkHref === 'index.html' || linkHref === './' || linkHref === '/') && currentScroll < (indexPageSectionsForNav[0].offsetTop - headerOffset - 50) && indexPageSectionsForNav[0]?.id === 'about') {
-					link.classList.add('active');
-				}
+			if (linkHref && linkHref.startsWith('#') && linkHref.substring(1) === currentSectionId) {
+				link.classList.add('active');
+			} else if (linkHref === 'index.html' && currentScroll < (indexPageSectionsForNav[0].offsetTop - headerOffset - 50) && indexPageSectionsForNav[0]?.id === 'about') {
+				// Special case for "Home" or "About" at the very top of index.html
+				link.classList.add('active');
 			}
 		});
 	}
