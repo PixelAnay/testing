@@ -116,7 +116,7 @@ html:not([data-theme="dark"]) .theme-toggle-button .moon-icon { opacity: 0; tran
 [data-theme="dark"] .theme-toggle-button .sun-icon { opacity: 0; transform: translate(-50%, -50%) scale(0.5) rotate(90deg); }
 [data-theme="dark"] .theme-toggle-button .moon-icon { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
 
-.hamburger-menu { display: none; cursor: pointer; background: transparent; border: none; padding: 0; z-index: 1051; margin-left: 10px; order: 3; }
+.hamburger-menu { display: none; cursor: pointer; background: transparent; border: none; padding-top: 20px; padding-bottom: 20px; z-index: 1051; margin-left: 10px; order: 3; }
 .hamburger-menu .bar { display: block; width: 28px; height: 3px; margin: 6px auto; background-color: var(--text-color); transition: 0.3s ease-in-out, background-color 0.3s ease; border-radius: 1px; }
 .hamburger-menu.is-active .bar:first-child { transform: translateY(9px) rotate(45deg); }
 .hamburger-menu.is-active .bar:nth-child(2) { opacity: 0; }
