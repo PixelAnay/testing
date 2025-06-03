@@ -95,7 +95,7 @@ img { vertical-align: middle; border-style: none; max-width: 100%; height: auto;
 /* ============================================= */
 .main-header {
   background-color: var(--background-color);
-  padding: 1rem 0;
+
   position: fixed;
   width: 100%;
   top: 0;
@@ -109,7 +109,7 @@ img { vertical-align: middle; border-style: none; max-width: 100%; height: auto;
 .logo:hover { color: var(--logo-color-light); text-decoration: none; }
 .logo img, .logo svg { margin-right: 10px; fill: var(--logo-color-light); transition: fill 0.3s ease; }
 
-.theme-toggle-button { background: none; border: none; cursor: pointer; padding: 0; margin-left: 10px; display: inline-flex; align-items: center; justify-content: center; color: var(--text-color); transition: color 0.3s ease; order: 2; position: relative; width: 32px; height: 32px; }
+.theme-toggle-button { background: none; border: none; cursor: pointer; padding: 30px; margin-left: 10px; display: inline-flex; align-items: center; justify-content: center; color: var(--text-color); transition: color 0.3s ease; order: 2; position: relative; width: 32px; height: 32px; }
 .theme-toggle-button svg { width: 22px; height: 22px; transition: opacity 0.4s ease, transform 0.4s ease; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(1); }
 html:not([data-theme="dark"]) .theme-toggle-button .sun-icon { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
 html:not([data-theme="dark"]) .theme-toggle-button .moon-icon { opacity: 0; transform: translate(-50%, -50%) scale(0.5) rotate(-90deg); }
