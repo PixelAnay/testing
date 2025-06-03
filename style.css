@@ -37,6 +37,11 @@
   --particle-color-1-dark: rgb(255, 68, 0);
   --particle-color-2-dark: rgb(255, 255, 255);
   --particle-color-3-dark: rgba(7, 255, 255, 0.911);
+
+  /* Navigation specific variables */
+  --header-height: 70px; /* Default fallback, JS will override */
+  --desktop-nav-width: 230px;
+  --mobile-nav-width: 280px;
 }
 
 /* ============================================= */
@@ -62,6 +67,8 @@ body {
   background-color: var(--background-color);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  padding-top: var(--header-height); /* Compensate for fixed header */
+  transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1); /* For mobile nav content push */
 }
 
 h1,
@@ -195,12 +202,14 @@ img {
 /* ============================================= */
 .main-header {
   background-color: var(--background-color);
-  padding: 1rem 0;
-  position: sticky;
+  padding: 1rem 0; /* This contributes to height */
+  position: fixed; /* Changed to fixed for reliable offset and body push */
+  width: 100%;
   top: 0;
-  z-index: 1020;
+  left: 0;
+  z-index: 1020; /* Above desktop nav, below mobile nav hamburger */
   border-bottom: 1px solid var(--border-color);
-  transition: background-color 0.3s ease, border-bottom-color 0.3s ease; /* For theme switch */
+  transition: background-color 0.3s ease, border-bottom-color 0.3s ease, transform 0.35s cubic-bezier(0.23, 1, 0.32, 1);
 }
 .main-header .container {
   display: flex;
@@ -215,7 +224,7 @@ img {
   text-decoration: none;
   display: flex;
   align-items: center;
-  margin-right: auto;
+  margin-right: auto; /* Pushes other items to the right */
   flex-shrink: 0;
   transition: color 0.3s ease;
 }
@@ -230,78 +239,31 @@ img {
   transition: fill 0.3s ease;
 }
 
-.main-nav {
-  display: block;
-  margin-right: 15px;
-}
-.main-nav ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-}
-.main-nav li {
-  margin-left: 1.8rem;
-}
-.main-nav a {
-  font-weight: 500;
-  font-size: 0.95rem;
-  color: var(--text-color);
-  padding: 0.3rem 0;
-  position: relative;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-.main-nav a.active,
-.main-nav a:hover {
-  color: var(--accent-color-for-lines);
-  text-decoration: none;
-}
-.main-nav a::after {
-  content: "";
-  position: absolute;
-  width: 0;
-  height: 2px;
-  display: block;
-  margin-top: 3px;
-  right: 0;
-  background: var(--accent-color-for-lines);
-  transition: width 0.2s ease-out, background-color 0.3s ease; /* Smoother transition & theme */
-}
-.main-nav a.active::after,
-.main-nav a:hover::after {
-  width: 100%;
-  left: 0;
-  right: auto;
-}
-
 .theme-toggle-button {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0; /* Adjusted for direct icon sizing */
-  margin-left: 10px;
+  padding: 0;
+  margin-left: 10px; /* Spacing from potential nav or logo */
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: var(--text-color);
   transition: color 0.3s ease;
-  order: 1;
-  position: relative; /* For absolute positioning of SVGs */
-  width: 32px; /* Ensure button has size for icons */
-  height: 32px; /* Ensure button has size for icons */
+  order: 2; /* Order in flex container */
+  position: relative;
+  width: 32px;
+  height: 32px;
 }
 .theme-toggle-button svg {
   width: 22px;
   height: 22px;
   transition: opacity 0.4s ease, transform 0.4s ease;
-  position: absolute; /* Add this */
-  top: 50%; /* Add this */
-  left: 50%; /* Add this */
-  transform: translate(-50%, -50%) scale(1); /* Add this, start with scale 1 */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1);
 }
-
-/* Light mode (default) icons visibility */
 html:not([data-theme="dark"]) .theme-toggle-button .sun-icon {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1) rotate(0deg);
@@ -310,8 +272,6 @@ html:not([data-theme="dark"]) .theme-toggle-button .moon-icon {
   opacity: 0;
   transform: translate(-50%, -50%) scale(0.5) rotate(-90deg);
 }
-
-/* Dark mode icons visibility */
 [data-theme="dark"] .theme-toggle-button .sun-icon {
   opacity: 0;
   transform: translate(-50%, -50%) scale(0.5) rotate(90deg);
@@ -322,14 +282,14 @@ html:not([data-theme="dark"]) .theme-toggle-button .moon-icon {
 }
 
 .hamburger-menu {
-  display: none;
+  display: none; /* Hidden by default, shown in media query */
   cursor: pointer;
   background: transparent;
   border: none;
   padding: 0;
-  z-index: 1051;
-  margin-left: 10px;
-  order: 2;
+  z-index: 1051; /* Above mobile nav panel content */
+  margin-left: 10px; /* Spacing from theme toggle */
+  order: 3; /* Last item in header flex row */
 }
 .hamburger-menu .bar {
   display: block;
@@ -337,7 +297,7 @@ html:not([data-theme="dark"]) .theme-toggle-button .moon-icon {
   height: 3px;
   margin: 6px auto;
   background-color: var(--text-color);
-  transition: 0.3s ease-in-out, background-color 0.3s ease; /* Added theme transition */
+  transition: 0.3s ease-in-out, background-color 0.3s ease;
   border-radius: 1px;
 }
 .hamburger-menu.is-active .bar:first-child {
@@ -350,25 +310,169 @@ html:not([data-theme="dark"]) .theme-toggle-button .moon-icon {
   transform: translateY(-9px) rotate(-45deg);
 }
 
+/* ============================================= */
+/* Desktop Vertical Navigation (.main-nav)     */
+/* ============================================= */
+@media (min-width: 992px) {
+  .main-nav {
+    display: flex !important; /* Override display:none from mobile styles if any */
+    flex-direction: column;
+    position: fixed;
+    left: 0;
+    top: var(--header-height); /* Position below the fixed header */
+    width: var(--desktop-nav-width);
+    height: calc(100vh - var(--header-height));
+    background-color: var(--background-color);
+    padding: 20px 0;
+    border-right: 1px solid var(--border-color);
+    overflow-y: auto;
+    z-index: 1000; /* Below header */
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+  .main-nav ul {
+    flex-direction: column;
+    width: 100%;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .main-nav li {
+    margin-left: 0;
+    width: 100%;
+  }
+  .main-nav a {
+    display: block;
+    padding: 12px 25px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--text-color);
+    text-decoration: none;
+    position: relative;
+    /* border-bottom: 1px solid var(--border-color); Optional if you want separators */
+    transition: color 0.3s ease, background-color 0.2s ease;
+  }
+  .main-nav a:hover,
+  .main-nav a.active {
+    color: var(--accent-color-for-lines);
+    background-color: rgba(0,0,0,0.03); /* Subtle hover/active background */
+    text-decoration: none;
+  }
+  .main-nav a::after { /* Vertical indicator for active/hover */
+    content: "";
+    position: absolute;
+    width: 4px;
+    height: 0%; /* Initially hidden */
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    background: var(--accent-color-for-lines);
+    transition: height 0.2s ease-out, background-color 0.3s ease;
+  }
+  .main-nav a.active::after,
+  .main-nav a:hover::after {
+    height: 60%; /* Adjust as preferred */
+  }
+
+  /* Hide mobile-specific elements on desktop */
+  .hamburger-menu {
+    display: none !important;
+  }
+  .mobile-nav-panel {
+    display: none !important;
+  }
+
+  /* Adjust main content and footer for desktop vertical nav */
+  main,
+  .main-footer { /* Apply to footer as well */
+    margin-left: var(--desktop-nav-width);
+    transition: margin-left 0.3s ease;
+  }
+}
+
+
+/* ============================================= */
+/* Mobile Vertical Navigation (.mobile-nav-panel)*/
+/* ============================================= */
 .mobile-nav-panel {
   position: fixed;
-  top: 0;
-  right: -100%;
-  width: 80%;
-  max-width: 320px;
+  top: 0; /* Aligns with the very top of the viewport */
+  left: calc(-1 * var(--mobile-nav-width)); /* Off-screen to the left */
+  width: var(--mobile-nav-width);
   height: 100vh;
   background-color: var(--background-color);
-  box-shadow: -3px 0 10px rgba(0, 0, 0, 0.1);
-  z-index: 1050;
-  transition: right 0.35s cubic-bezier(0.23, 1, 0.32, 1),
-    background-color 0.3s ease, box-shadow 0.3s ease; /* Added theme transition */
-  padding: 80px 0 20px;
+  box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1); /* Shadow on the right edge */
+  z-index: 1050; /* High z-index to be on top of content, but hamburger is higher */
+  transition: left 0.35s cubic-bezier(0.23, 1, 0.32, 1),
+    background-color 0.3s ease, box-shadow 0.3s ease;
+  padding: 20px 0; /* Padding for content inside the panel */
   overflow-y: auto;
   display: flex;
   flex-direction: column;
 }
 .mobile-nav-panel.open {
-  right: 0;
+  left: 0; /* Slides into view */
+}
+.mobile-nav-panel ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  /* Calculate top padding to clear the fixed header if body wasn't pushed */
+  /* However, since header is also pushed, this might not be needed or can be simpler */
+  padding-top: var(--header-height); /* Start links below where header *would* be */
+}
+.mobile-nav-panel li a {
+  display: block;
+  padding: 15px 30px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-color);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s, color 0.2s, border-bottom-color 0.3s ease;
+}
+.mobile-nav-panel li:first-child a {
+  border-top: 1px solid var(--border-color); /* If padding-top on ul is not enough, or for style */
+}
+.mobile-nav-panel li a.active,
+.mobile-nav-panel li a:hover {
+  background-color: #f0f8ff;
+  color: var(--accent-color-for-lines);
+}
+/* Ensure desktop ::after doesn't apply to mobile panel links if classes are reused */
+.mobile-nav-panel a::after {
+    display: none;
+}
+
+
+/* Body push for mobile nav: applies to header, main, and footer */
+body.mobile-nav-active .main-header,
+body.mobile-nav-active main,
+body.mobile-nav-active .main-footer {
+  transform: translateX(var(--mobile-nav-width));
+}
+/* Ensure the main header maintains its fixed properties correctly when transformed */
+body.mobile-nav-active .main-header {
+    /* Already position:fixed, transform will apply correctly */
+}
+
+
+/* Media query to hide .main-nav (desktop) and show .hamburger-menu on mobile */
+@media (max-width: 991.98px) {
+  .main-nav { /* This is the desktop nav */
+    display: none;
+  }
+  .hamburger-menu {
+    display: block; /* Show hamburger */
+  }
+  main, .main-footer {
+      margin-left: 0; /* No fixed left margin for content on mobile */
+  }
+  /* Reset body transform if it was set by a wider screen with mobile-nav-active */
+  body:not(.mobile-nav-active) .main-header,
+  body:not(.mobile-nav-active) main,
+  body:not(.mobile-nav-active) .main-footer {
+    transform: translateX(0);
+  }
 }
 
 .btn-icon {
@@ -378,42 +482,20 @@ html:not([data-theme="dark"]) .theme-toggle-button .moon-icon {
 }
 
 .btn-icon .btn-svg-icon {
-  /* Added .btn-icon parent for specificity */
   transition: transform 0.2s ease-in-out;
 }
 .btn-icon:hover .btn-svg-icon {
   transform: translateY(2px);
 }
 
-.mobile-nav-panel ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.mobile-nav-panel li a {
-  display: block;
-  padding: 18px 30px;
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: var(--text-color);
-  text-decoration: none;
-  border-bottom: 1px solid var(--border-color);
-  transition: background-color 0.2s, color 0.2s, border-bottom-color 0.3s ease; /* Added theme transition */
-}
-.mobile-nav-panel li:first-child a {
-  border-top: 1px solid var(--border-color);
-  transition: background-color 0.2s, color 0.2s, border-top-color 0.3s ease,
-    border-bottom-color 0.3s ease; /* Added theme transition */
-}
-.mobile-nav-panel li a.active,
-.mobile-nav-panel li a:hover {
-  background-color: #f0f8ff;
-  color: var(--accent-color-for-lines);
-}
 
 /* ============================================= */
 /* Page Sections                               */
 /* ============================================= */
+main { /* Transition for margin-left changes */
+  transition: margin-left 0.3s ease, transform 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
 section {
   padding: 80px 0;
   background-color: var(--background-color);
@@ -952,7 +1034,7 @@ section#all-skills {
   font-size: 0.9rem;
   border-top: 1px solid var(--border-color);
   transition: background-color 0.3s ease, color 0.3s ease,
-    border-top-color 0.3s ease;
+    border-top-color 0.3s ease, transform 0.35s cubic-bezier(0.23, 1, 0.32, 1), margin-left 0.3s ease;
 }
 .main-footer p {
   margin-bottom: 0.5rem;
@@ -1061,7 +1143,6 @@ section#all-skills {
 .skills-header, .skill-category, 
 #resume.centered-action, #contact .contact-form,
 .project-card, .timeline-item, .blog-post-summary, .section-title {
-  /* Added .section-title */
   opacity: 0;
   transform: translateY(30px);
 }
@@ -1076,7 +1157,6 @@ section#all-skills {
 .project-card,
 .blog-post-summary,
 .section-title {
-  /* Added .section-title */
   transition: opacity 0.6s ease-out var(--reveal-stagger-delay, 0s),
     transform 0.6s ease-out var(--reveal-stagger-delay, 0s);
 }
@@ -1097,7 +1177,6 @@ section#all-skills {
 .timeline-item.is-visible,
 .blog-post-summary.is-visible,
 .section-title.is-visible {
-  /* Added .section-title.is-visible */
   opacity: 1;
   transform: translateY(0);
 }
@@ -1190,35 +1269,38 @@ section#all-skills {
   fill: var(--logo-color-dark);
 }
 
-[data-theme="dark"] .main-header {
-  border-bottom-color: var(--border-color);
+/* Dark theme for Desktop Vertical Nav */
+@media (min-width: 992px) {
+  [data-theme="dark"] .main-nav {
+    background-color: var(--background-color);
+    border-right-color: var(--border-color);
+  }
+  [data-theme="dark"] .main-nav a:hover,
+  [data-theme="dark"] .main-nav a.active {
+    background-color: rgba(255,255,255,0.05); /* Darker subtle hover */
+  }
 }
-
+/* Dark theme for Mobile Vertical Nav Panel */
+[data-theme="dark"] .mobile-nav-panel {
+    background-color: var(--background-color);
+    box-shadow: 3px 0 10px rgba(0,0,0,0.3); /* Adjusted shadow for dark */
+}
 [data-theme="dark"] .mobile-nav-panel li a {
   border-bottom-color: var(--border-color);
+  color: var(--text-color);
 }
 [data-theme="dark"] .mobile-nav-panel li:first-child a {
   border-top-color: var(--border-color);
 }
-[data-theme="dark"] .mobile-nav-panel {
-  background-color: var(--background-color);
-  box-shadow: -3px 0 10px rgba(0, 0, 0, 0.3);
-}
 [data-theme="dark"] .mobile-nav-panel li a.active,
 [data-theme="dark"] .mobile-nav-panel li a:hover {
-  background-color: #2c2d2e;
+  background-color: #2c2d2e; /* Darker active/hover for mobile */
   color: var(--accent-color-for-lines);
 }
-[data-theme="dark"] .main-nav a,
-[data-theme="dark"] .mobile-nav-panel li a {
-  color: var(--text-color);
-}
-[data-theme="dark"] .main-nav a.active,
-[data-theme="dark"] .main-nav a:hover {
-  color: var(--accent-color-for-lines);
-}
-[data-theme="dark"] .main-nav a::after {
-  background: var(--accent-color-for-lines);
+
+
+[data-theme="dark"] .main-header {
+  border-bottom-color: var(--border-color);
 }
 [data-theme="dark"] .hamburger-menu .bar {
   background-color: var(--text-color);
@@ -1304,26 +1386,12 @@ section#all-skills {
 }
 
 /* ============================================= */
-/* Media Queries (Responsive Design)           */
+/* Media Queries (Responsive Design Adjustments) */
 /* ============================================= */
 @media (max-width: 991.98px) {
-  .main-nav {
-    display: none;
-  }
-  .hamburger-menu {
-    display: block;
-    order: 3;
-    margin-left: 0;
-  }
-  .logo {
-    margin-right: 0;
-    order: 1;
-  }
-  .theme-toggle-button {
-    order: 2;
-    margin-left: auto;
-    margin-right: 10px;
-  }
+  /* .main-nav is already display:none via a more specific rule */
+  /* .hamburger-menu is already display:block via a more specific rule */
+  /* .logo, .theme-toggle-button ordering handled by flex order in .main-header */
 
   .hero h1 {
     font-size: 2.6rem;
@@ -1390,12 +1458,12 @@ section#all-skills {
   }
   .timeline-item {
     padding-left: 50px;
-    transform: translateX(0);
+    transform: translateX(0); /* Already default for mobile */
   }
   .timeline-icon {
     width: 36px;
     height: 36px;
-    left: -2px;
+    left: -2px; /* Adjust if needed with new padding */
   }
   .timeline-icon svg {
     width: 18px;
@@ -1431,8 +1499,8 @@ section#all-skills {
     right: 15px;
     padding: 8px;
   }
-  #backToTopBtn svg {
-    width: 35px;
-    height: 35px;
+  #backToTopBtn svg { /* SVG was 20x20, button padding made it look smaller */
+    width: 20px; /* Keep consistent with original intent */
+    height: 20px;
   }
 }

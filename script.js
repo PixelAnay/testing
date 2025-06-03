@@ -1,7 +1,22 @@
 // script.js
 document.addEventListener("DOMContentLoaded", function() {
 	const header = document.querySelector(".main-header");
+
+	// Set CSS --header-height custom property
+	if (header) {
+		const setHeaderHeightProperty = () => {
+			const headerHeight = header.offsetHeight + 'px';
+			document.documentElement.style.setProperty('--header-height', headerHeight);
+		};
+		setHeaderHeightProperty();
+		// Consider recalculating on resize if header content can change its height,
+		// but for this project, it's likely stable after load.
+		// window.addEventListener('resize', setHeaderHeightProperty);
+	}
+	// This headerOffset is used for scroll calculations for nav highlighting and smooth scroll
 	const headerOffset = header ? header.offsetHeight : 70;
+
+
 	const hamburger = document.querySelector(".hamburger-menu");
 	const mobileNavPanel = document.querySelector(".mobile-nav-panel");
 	const yearSpan = document.getElementById("currentYear");
@@ -15,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		const originalText = "Hello, I'm Anay";
 		const typingSpeed = 80; // Milliseconds per character
 		let charIndex = 0;
-		heroTitleElement.innerHTML = ' ';
+		heroTitleElement.innerHTML = ' ';
 
 		function typeWriter() {
 			if (charIndex < originalText.length) {
@@ -311,14 +326,16 @@ document.addEventListener("DOMContentLoaded", function() {
 	}
 
 	// --- MOBILE MENU & NAVIGATION ---
-	const mainNavDesktopLinks = document.querySelectorAll('.main-nav a');
-	const mobileNavPanelLinks = document.querySelectorAll('.mobile-nav-panel a');
-	const allNavLinks = [...mainNavDesktopLinks, ...mobileNavPanelLinks];
+	const mainNavDesktopLinks = document.querySelectorAll('.main-nav a'); // Desktop nav links
+	const mobileNavPanelLinks = document.querySelectorAll('.mobile-nav-panel a'); // Mobile nav links
+	const allNavLinks = [...mainNavDesktopLinks, ...mobileNavPanelLinks]; // Combined for highlighting logic
 	let indexPageSectionsForNav = null;
 
 	function closeMobileMenu() {
 		if (mobileNavPanel && mobileNavPanel.classList.contains("open")) {
 			mobileNavPanel.classList.remove("open");
+			document.body.classList.remove("mobile-nav-active"); // For content push
+			document.body.style.overflowY = ''; // Allow body scroll
 			if (hamburger) {
 				hamburger.classList.remove("is-active");
 				hamburger.setAttribute("aria-expanded", "false");
@@ -330,46 +347,60 @@ document.addEventListener("DOMContentLoaded", function() {
 		const linkElement = this;
 		const hrefAttribute = linkElement.getAttribute("href");
 
-		if (mobileNavPanel && mobileNavPanel.contains(linkElement)) {
+		// If the link is inside the mobile nav panel, close it
+		if (mobileNavPanel && mobileNavPanel.classList.contains("open") && mobileNavPanel.contains(linkElement)) {
 			closeMobileMenu();
 		}
 
 		if (hrefAttribute.startsWith("mailto:") || linkElement.getAttribute("target") === "_blank" || typeof linkElement.getAttribute("download") === "string") {
-			return;
+			return; // Allow default behavior for mailto, target="_blank", and download links
 		}
 
-		e.preventDefault();
+		e.preventDefault(); // Prevent default for same-page anchors and page navigations
 
 		const targetUrl = new URL(linkElement.href, window.location.origin);
 		const currentUrl = new URL(window.location.href, window.location.origin);
 
+		// If it's a same-page anchor link
 		if (targetUrl.pathname === currentUrl.pathname && targetUrl.hash) {
 			const targetElement = document.querySelector(targetUrl.hash);
 			if (targetElement) {
 				const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+				// Use the globally available headerOffset
 				const offsetPosition = elementPosition - headerOffset;
 				window.scrollTo({
 					top: offsetPosition,
 					behavior: "smooth"
 				});
 			} else {
+				// Fallback if hash target not found but on same page (less likely for nav)
 				window.location.href = linkElement.href;
 			}
 		} else {
+			// It's a link to a different page or a link that should cause full page navigation
 			window.location.href = linkElement.href;
 		}
 	}
 
+	// Attach event listener to all navigation links (desktop, mobile, and hero anchors)
 	document.querySelectorAll('.main-nav a, .mobile-nav-panel a, .hero a[href^="#"]').forEach(anchor => {
 		anchor.addEventListener("click", handleNavLinkClick);
 	});
 
+
 	if (hamburger && mobileNavPanel) {
 		hamburger.addEventListener("click", () => {
 			const isOpen = mobileNavPanel.classList.toggle("open");
+			document.body.classList.toggle("mobile-nav-active", isOpen); // For content push
+			if (isOpen) {
+				document.body.style.overflowY = 'hidden'; // Prevent body scroll
+			} else {
+				document.body.style.overflowY = ''; // Allow body scroll
+			}
 			hamburger.classList.toggle("is-active", isOpen);
 			hamburger.setAttribute("aria-expanded", isOpen);
 		});
+		// Close mobile menu when clicking outside of it (but not on the hamburger itself)
 		document.addEventListener("click", function(event) {
 			if (mobileNavPanel.classList.contains("open") &&
 				!mobileNavPanel.contains(event.target) &&
@@ -378,6 +409,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			}
 		});
 	}
+
 
 	// --- NAVIGATION HIGHLIGHTING LOGIC ---
 	const currentPathForNav = window.location.pathname.replace(/\/$/, '');
@@ -398,48 +430,51 @@ document.addEventListener("DOMContentLoaded", function() {
 			let linkPath = linkUrl.pathname.replace(/\/$/, '');
 			const linkHash = linkUrl.hash;
 
+			// Normalize index.html paths to be equivalent to "/" or "/portfolio/"
 			if (linkPath.endsWith('index.html')) {
 				linkPath = linkPath.substring(0, linkPath.lastIndexOf('index.html'));
-				if (linkPath.endsWith('/')) linkPath = linkPath.slice(0, -1);
+				if (linkPath.endsWith('/')) linkPath = linkPath.slice(0, -1); // remove trailing slash if any
+				if (linkPath === '/portfolio' && activePath === '') activePath = '/portfolio'; // Consistency
 			}
-
-			if (linkPath === '' && activePath.endsWith('/portfolio')) { // Handle case where link is "/" but current path is "/portfolio/"
-				activePath = '';
-			}
-			if (linkPath === '/portfolio' && activePath === '') { // Handle case where link is "/portfolio/" but current path is "/"
-				// Don't do anything here, let the normal comparison proceed
+			if (activePath.endsWith('index.html')) { // Also normalize current path if it has index.html
+				activePath = activePath.substring(0, activePath.lastIndexOf('index.html'));
+				if (activePath.endsWith('/')) activePath = activePath.slice(0, -1);
 			}
 
 
-			if (linkPath === activePath) {
-				if (isIndexPageForNav && linkHash && linkHash === activeHash) {
+			if (linkPath === activePath || (linkPath === "/portfolio" && activePath === "") || (linkPath === "" && activePath === "/portfolio")) {
+				if (isIndexPageForNav && linkHash && linkHash === activeHash) { // Hash match on index page
 					link.classList.add('active');
 					foundActive = true;
-					return;
+					return; // Exact hash match found
 				}
-				if (isIndexPageForNav && !linkHash && !activeHash && !foundActive) {
-					if (linkHref === "index.html" || linkHref === "./" || linkHref === "/" || linkHref === "#about") {
+				if (isIndexPageForNav && !linkHash && !activeHash && !foundActive) { // No hash, on index page
+					// Prioritize 'About' or 'Home' (index.html itself)
+					if (linkHref === "index.html" || linkHref === "./" || linkHref === "/" || linkHref === "#about" || linkHref.startsWith("index.html#about")) {
 						link.classList.add('active');
 						foundActive = true;
 					}
-				} else if (!isIndexPageForNav && !linkHash && !foundActive) {
+				} else if (!isIndexPageForNav && !linkHash && !foundActive) { // Not on index page, direct page match
 					link.classList.add('active');
 					foundActive = true;
 				}
 			}
 		});
 
+		// If on index page, no specific hash in URL, and no link activated yet, default to 'About'
 		if (isIndexPageForNav && !activeHash && !foundActive) {
 			allNavLinks.forEach(link => {
-				if (foundActive) return; // if already activated one via "#about" in previous block
+				if (foundActive) return;
 				const linkHref = link.getAttribute('href');
-				if (linkHref === 'index.html' || linkHref === '#' || linkHref === './' || linkHref.startsWith('#about')) {
+				// Check for links pointing to 'index.html' or '#about'
+				if (linkHref === 'index.html' || linkHref === '#' || linkHref === './' || linkHref.startsWith('#about') || linkHref.startsWith('index.html#about')) {
 					link.classList.add('active');
 					foundActive = true;
 				}
 			});
 		}
-		// If still no active link and on index page, default to #about or first section
+
+		// If still no active link and on index page, default to the first section's link if available (e.g., #about)
 		if (isIndexPageForNav && !foundActive && indexPageSectionsForNav && indexPageSectionsForNav.length > 0) {
 			const firstSectionId = indexPageSectionsForNav[0].id;
 			allNavLinks.forEach(link => {
@@ -459,19 +494,21 @@ document.addEventListener("DOMContentLoaded", function() {
 		const currentScroll = window.pageYOffset;
 
 		indexPageSectionsForNav.forEach(section => {
-			const sectionTop = section.offsetTop - headerOffset - 50;
+			// Use the global headerOffset for accurate top calculation
+			const sectionTop = section.offsetTop - headerOffset - 50; // 50px buffer
 			const sectionBottom = sectionTop + section.offsetHeight;
 			if (currentScroll >= sectionTop && currentScroll < sectionBottom) {
 				currentSectionId = section.getAttribute("id");
 			}
 		});
 
-		if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight - 100) {
+		// If scrolled to the very bottom of the page, highlight the last section link
+		if (window.innerHeight + window.pageYOffset >= document.body.offsetHeight - 100) { // 100px buffer from bottom
 			const lastSection = indexPageSectionsForNav[indexPageSectionsForNav.length - 1];
 			if (lastSection) currentSectionId = lastSection.id;
 		}
 
-
+		// If at the very top, before the first section, highlight the 'About' link (or first section)
 		if (!currentSectionId && currentScroll < (indexPageSectionsForNav[0].offsetTop - headerOffset - 50) && indexPageSectionsForNav[0]) {
 			currentSectionId = indexPageSectionsForNav[0].id;
 		}
@@ -480,11 +517,19 @@ document.addEventListener("DOMContentLoaded", function() {
 		allNavLinks.forEach(link => {
 			link.classList.remove('active');
 			const linkHref = link.getAttribute('href');
-			if (linkHref && linkHref.startsWith('#') && linkHref.substring(1) === currentSectionId) {
-				link.classList.add('active');
-			} else if (linkHref === 'index.html' && currentScroll < (indexPageSectionsForNav[0].offsetTop - headerOffset - 50) && indexPageSectionsForNav[0]?.id === 'about') {
-				// Special case for "Home" or "About" at the very top of index.html
-				link.classList.add('active');
+			if (linkHref) {
+				// Handle direct hash links (e.g., #about)
+				if (linkHref.startsWith('#') && linkHref.substring(1) === currentSectionId) {
+					link.classList.add('active');
+				}
+				// Handle links like 'index.html#about'
+				else if (linkHref.includes('#') && linkHref.substring(linkHref.indexOf('#') + 1) === currentSectionId) {
+					link.classList.add('active');
+				}
+				// Special case for "Home" or "About" link when at the very top of index.html
+				else if ((linkHref === 'index.html' || linkHref === './' || linkHref === '/') && currentScroll < (indexPageSectionsForNav[0].offsetTop - headerOffset - 50) && indexPageSectionsForNav[0]?.id === 'about') {
+					link.classList.add('active');
+				}
 			}
 		});
 	}
@@ -495,7 +540,7 @@ document.addEventListener("DOMContentLoaded", function() {
 			window.addEventListener("scroll", highlightNavOnScroll);
 		}
 	}
-	setActiveNavLink();
+	setActiveNavLink(); // Call it once on load
 
 
 	// --- FOOTER UTILITIES ---
